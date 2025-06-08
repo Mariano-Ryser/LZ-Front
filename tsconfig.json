@@ -1,0 +1,37 @@
+// Aqui Activamos TypeScript!!! Tenemos un problema en resolbeJsonModule
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "moduleResolution":"node",
+  },
+  "include": [
+    
+    "next-env.d.tsx",
+    "**/*.ts",
+    "**/*.tsx"
+, "components/cubo3D/cubo3d.js",
+ "pages/proyectos/personaje.js",
+  "pages/comentarBox/index.js",
+   "components/Footer.js",
+    "components/Cabezera.js",
+    "components/Layout.js", "components/NavRespon.jsx", "components/navigation/NavRespon.tsx", "components/cubo3D/test3.js", "pages/testColor.js", "pages/proyectos/apiMeteoro/cienciados.js", "next.config.js", "pages/proyectos/icons.js", "pages/index.tsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
