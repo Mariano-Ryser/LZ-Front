@@ -2,9 +2,6 @@
 import Link from 'next/link';
 import { AuthContext } from '../../components/auth/AuthProvider';
 import { useState, useContext } from 'react';
-import ComentarSection from './components/ComentarSection';
-import NotiSection from './components/NotiSection';
-import ImageSection from './components/ImageSection';
 import BlockPages from "./components/blockPages"
 
 export default function AdminDash() {
@@ -42,8 +39,8 @@ export default function AdminDash() {
       <div className="login-container">
         <div className="login-card">
           <div className="holographic-effect"></div>
-          <h1 className="login-title">Acceso al Panel</h1>
-          <p className="login-subtitle">Ingrese sus credenciales de administrador</p>
+          <h1 className="login-title">Login</h1>
+          <p className="login-subtitle">Kennwort eingeben</p>
              
           
           <form onSubmit={handleLogin} className="login-form">
@@ -60,7 +57,7 @@ export default function AdminDash() {
             </div>
             
             <button type="submit" className="login-button">
-              <span>Acceder</span>
+              <span>Logger</span>
               <div className="button-border"></div>
             </button>
           </form>
@@ -82,11 +79,8 @@ export default function AdminDash() {
             width: 100%;
             max-width: 420px;
             padding: 2.5rem;
-            background: rgba(20, 20, 40, 0.8);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background-color: rgba(197, 231, 255, 1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(10, 218, 255, 0.3);
             overflow: hidden;
           }
           
@@ -95,8 +89,8 @@ export default function AdminDash() {
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, rgba(10, 218, 255, 0.8), transparent);
+            height: 7px;
+            background: linear-gradient(90deg, transparent, rgba(0, 47, 255, 0.8), transparent);
             animation: hologram 3s infinite;
           }
           
@@ -106,19 +100,16 @@ export default function AdminDash() {
           }
           
           .login-title {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 600;
-            color: #fff;
+            color: black;
             margin-bottom: 0.5rem;
             text-align: center;
-            background: linear-gradient(90deg, #0adaff, #00ffaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+           
           }
           
           .login-subtitle {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
             margin-bottom: 2rem;
             text-align: center;
           }
@@ -138,9 +129,6 @@ export default function AdminDash() {
             padding: 1rem 1rem 0.5rem;
             font-size: 1rem;
             border: none;
-            border-bottom: 1px solid rgba(10, 218, 255, 0.5);
-            background: transparent;
-            color: #fff;
             outline: none;
             transition: all 0.3s ease;
           }
@@ -155,8 +143,7 @@ export default function AdminDash() {
             color: rgba(10, 218, 255, 1);
           }
           
-       
-          
+
           .input-highlight {
             position: absolute;
             bottom: 0;
@@ -164,60 +151,31 @@ export default function AdminDash() {
             width: 0;
             height: 2px;
             background: rgba(10, 218, 255, 1);
-            transition: width 0.3s ease;
           }
-          
-          .login-input:focus ~ .input-highlight {
-            width: 100%;
+          span{
+            color: white;
           }
+        
           
           .login-button {
             position: relative;
             padding: 0.8rem 1.5rem;
             font-size: 1rem;
-            color: #fff;
-            background: transparent;
+             background-color: rgb(3, 23, 202);
+            
+            
             border: none;
-            cursor: pointer;
             overflow: hidden;
             margin-top: 1rem;
+            transition: background-color 0.2s ease;
+          }
+  
+          .login-button:hover{
+           background-color: rgba(5, 58, 231, 0.89);
           }
           
-          .login-button span {
-            position: relative;
-            z-index: 2;
-          }
-          
-          .button-border {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 1px solid rgba(10, 218, 255, 0.5);
-            border-radius: 4px;
-            transition: all 0.3s ease;
-          }
-          
-          .login-button:hover .button-border {
-            border-color: rgba(10, 218, 255, 1);
-            box-shadow: 0 0 10px rgba(10, 218, 255, 0.5);
-          }
-          
-          .login-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(10, 218, 255, 0.2), transparent);
-            transition: all 0.5s ease;
-          }
-          
-          .login-button:hover::before {
-            left: 100%;
-          }
+       
+  
           
           .error-message {
             color: #ff4d4d;
@@ -252,39 +210,11 @@ export default function AdminDash() {
         </div>
        
         <nav className="sidebar-nav">
-          <button 
-            className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <span className="nav-icon">📊</span>
-            <span>Dashboard</span>
-          </button>
-          
-          <button 
-            className={`nav-item ${activeTab === 'comments' ? 'active' : ''}`}
-            onClick={() => setActiveTab('comments')}
-          >
-            <span className="nav-icon">💬</span>
-            <span>Comentarios</span>
-          </button>
-          
-          <button 
-            className={`nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-            onClick={() => setActiveTab('notifications')}
-          >
-            <span className="nav-icon">🔔</span>
-            <span>Notificaciones</span>
-          </button>
+   
           
          
 
-          <button 
-            className={`nav-item ${activeTab === 'media' ? 'active' : ''}`}
-            onClick={() => setActiveTab('media')}
-          >
-            <span className="nav-icon">🖼️</span>
-            <span>Multimedia</span>
-          </button>
+     
 
         </nav>
   
@@ -311,7 +241,7 @@ export default function AdminDash() {
             <div className="dashboard-grid">
 
 
-<BlockPages></BlockPages>
+
         
 
 
@@ -320,9 +250,7 @@ export default function AdminDash() {
             </div>
           )}
           
-          {activeTab === 'comments' && <ComentarSection />}
-          {activeTab === 'notifications' && <NotiSection />}
-          {activeTab === 'media' && <ImageSection />}
+   
         </div>
       </div>
       
@@ -330,14 +258,13 @@ export default function AdminDash() {
         .admin-dashboard {
           display: flex;
           min-height: 90vh;
-          color: #fff;
           font-family: 'Segoe UI', Arial, sans-serif;
         }
         
         /* Sidebar Styles */
         .admin-sidebar {
           backdrop-filter: blur(10px);
-          border-right: 1px solid rgba(10, 218, 255, 0.1);
+          border-right: 2px solid rgba(0, 0, 0, 0.34);
           display: flex;
           flex-direction: column;
           padding: 1.5rem 0;
@@ -353,9 +280,6 @@ export default function AdminDash() {
           font-size: 1.3rem;
           font-weight: 600;
           margin-bottom: 0.5rem;
-          background: linear-gradient(90deg, #0adaff, #00ffaa);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
         }
         
       
@@ -383,15 +307,9 @@ export default function AdminDash() {
           font-size: 0.95rem;
         }
         
-        .nav-item:hover {
-          background: rgba(10, 218, 255, 0.1);
-          color: #fff;
-        }
+    
         
-        .nav-item.active {
-          background: rgba(10, 218, 255, 0.2);
-          color: #0adaff;
-        }
+     
         
         .nav-icon {
           font-size: 1.1rem;
@@ -403,16 +321,15 @@ export default function AdminDash() {
           padding: 1rem 1rem;
           margin: 1rem;
           border-radius: 6px;
-          background: rgba(255, 50, 50, 0.1);
+          background: rgba(255, 50, 50, 0.8);
           border: none;
-          color: rgba(255, 100, 100, 0.8);
           cursor: pointer;
           transition: all 0.3s ease;
+           color:rgb(255, 255, 255);
         }
         
         .logout-button:hover {
-          background: rgba(255, 50, 50, 0.2);
-          color: #ff6464;
+          background: rgba(212, 20, 20, 0.68);
         }
         
         /* Main Content Styles */
@@ -433,9 +350,6 @@ export default function AdminDash() {
         .content-title {
           font-size: 1.8rem;
           font-weight: 600;
-          background: linear-gradient(90deg, #fff, #0adaff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
         }
         
         .stats-bar {
@@ -443,20 +357,7 @@ export default function AdminDash() {
           gap: 1rem;
         }
         
-        .stat-card {
-          padding: 0.8rem 1.2rem;
-          border-radius: 8px;
-          border: 1px solid rgba(10, 218, 255, 0.2);
-          text-align: center;
-          min-width: 80px;
-        }
-        
-        .stat-value {
-          display: block;
-          font-size: 1.3rem;
-          font-weight: 600;
-          color: #0adaff;
-        }
+     
         
         .stat-label {
           display: block;

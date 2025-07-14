@@ -7,38 +7,25 @@ export default function About() {
       <div className="cyber-about-container">
         <div className="cyber-about-content">
           <div className="cyber-logo-container">
-            <Image 
-              src="/img/oja.png" 
-              alt="Holographic Logo" 
-              width={240} 
-              height={190} 
-              className="cyber-logo"
-            />
-            <div className="cyber-logo-glow"></div>
+           <h1>LZ LAGER</h1>
           </div>
           
           <div className="cyber-text-grid">
-            <p className="cyber-text">
-              It started as a virtual curriculum which later transformed into a blog, and then a complete
-              server in which I continue testing and working hard to expand my knowledge on the subject.
-            </p>
-            
-            <p className="cyber-text">
-              This portfolio is built on Next.JS where my frontend runs, and the backend is deployed
-              on Azure, the database interaction is created with NodeJs and Mongo DB.
-            </p>
-            
-            <p className="cyber-text">
-              Confident, due to the lack of current development and the scarcity of information available to everyone. 
-              Monitoring, updates, careful development. Consistent with my progress. Grateful despite the constant 
-              hostility to new ideas and contagious collective impatience.
-            </p>
-            
-            
-            <p className="cyber-text">
-              If you have any good comments or constructive criticism, they are always helpful to me. 
-              so I await your return!
-            </p>
+          <p className="cyber-text">
+  Im Labyrinth der Logistik, wo verlorene Artikel zu Legenden werden und Effizienz oft nur ein Gerücht ist, habe ich ein Tool entwickelt, das tatsächlich funktioniert: Eine präzise, blitzschnelle Artikelsuchmaschine für Lagerumgebungen. Keine Geisterpaletten mehr. Keine rätselhaften Regale. Nur Ergebnisse.
+</p>
+
+<p className="cyber-text">
+  Dies ist nicht einfach nur eine Suchleiste – es ist eine neuronale Verbindung zwischen Lagerchaos und menschlicher Klarheit. Mit Fokus auf Modularität konzipiert, kommuniziert dieses System effizient mit Backend-Services und ist bereit für zukünftige Skalierung, Rückverfolgbarkeit und Performance.
+</p>
+
+<p className="cyber-text">
+  Entwickelt mit denselben Technologien und Prinzipien wie mein gesamtes Portfolio – Next.JS im Frontend, Azure im Backend und MongoDB als Datenbasis – soll dieses Projekt Lagerprozesse durch intelligente Filterung, reaktionsschnelle UX und minimale kognitive Belastung optimieren.
+</p>
+
+<p className="cyber-text">
+  Jeder Scan, jede Anfrage, jeder Tastendruck zählt. Ich baue keine Interfaces – ich entwickle Werkzeuge für die Frontlinie. Wer Logistik kennt, weiß: Millisekunden sparen Geld. Sauberer Code bewegt Ware.
+</p>
           </div>
           
      
@@ -83,8 +70,6 @@ export default function About() {
         
         .cyber-text {
           margin: 0;
-          color: rgba(200, 220, 255, 0.9);
-          font-family: 'Courier New', monospace;
           font-size: 1.7rem;
           line-height: 1.6;
           position: relative;
@@ -113,7 +98,6 @@ export default function About() {
           background: rgba(10, 50, 80, 0.5);
           border: 1px solid rgba(10, 175, 255, 0.3);
           border-radius: 3px;
-          color: white;
           text-decoration: none;
           font-family: 'Courier New', monospace;
           transition: all 0.3s ease;

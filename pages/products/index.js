@@ -213,10 +213,9 @@ export function ListProduct() {
 
 <style jsx>{`
   .cyber-container {
-    padding: 1.5rem;
+    padding: 1rem;
     max-width: 1200px;
     margin: 0 auto;
-    background: #1f1f1f; /* Fondo oscuro */
     border-radius: 8px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
@@ -224,7 +223,7 @@ export function ListProduct() {
   .cyber-filters-compact {
     display: flex;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
   }
 
@@ -234,7 +233,7 @@ export function ListProduct() {
     border: 1px solid #444; /* Borde gris */
     border-radius: 8px;
     color: #fff; /* Texto blanco */
-    font-size: 1rem;
+    font-size: 01rem;
     min-width: 150px;
     transition: border-color 0.3s;
   }
@@ -263,14 +262,12 @@ export function ListProduct() {
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
-    background-color: #2a2a2a; /* Fondo oscuro de la tabla */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }
 
   .cyber-excel-header {
     display: grid;
     grid-template-columns: 100px 2fr 1fr 1fr 1fr 120px;
-    background: #333; /* Fondo oscuro para los encabezados */
     padding: 1rem;
     font-weight: 600;
     color: #ddd; /* Color de texto claro */
@@ -280,13 +277,13 @@ export function ListProduct() {
   .cyber-excel-row {
     display: grid;
     grid-template-columns: 100px 2fr 1fr 1fr 1fr 120px;
-    padding: 1rem;
+    padding: 0.3rem;
     border-top: 1px solid #444; /* Borde de las filas */
     transition: background 0.3s;
   }
 
   .cyber-excel-row:hover {
-    background: #444; /* Fondo al hacer hover */
+    background: #999; /* Fondo al hacer hover */
   }
 
   .cyber-excel-cell {
@@ -294,14 +291,12 @@ export function ListProduct() {
     align-items: center;
     justify-content: center;
     font-size: 0.95rem;
-    color: #fff; /* Texto blanco */
   }
 
   .cyber-excel-image {
     width: 60px;
     height: 60px;
     object-fit: cover;
-    border-radius: 8px;
   }
 
   .cyber-excel-delete {
@@ -322,8 +317,8 @@ export function ListProduct() {
   .cyber-total {
     text-align: right;
     font-weight: bold;
-    color: #28a745; /* Color verde para el total */
-    font-size: 1.2rem;
+    color:rgba(0, 0, 0, 0.83); /* Color verde para el total */
+    font-size: 1rem;
     margin-top: 1.5rem;
   }
 

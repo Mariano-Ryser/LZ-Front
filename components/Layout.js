@@ -1,12 +1,9 @@
-import NavRespon from "./navigation/NavRespon"
 import Cabezera from "./header/Cabezera"
 
 const Layout = ({ children}) => {
     return (
 
 <>
-
-              <NavRespon />   
                 <Cabezera />   
         <div className="content">    
              { children }
@@ -14,8 +11,8 @@ const Layout = ({ children}) => {
         
         <style jsx>{`
         
-         .content {
-            margin: auto ;
+  .content {
+    margin: auto ;
 		width: 100%;
 		max-width: calc(100% - 0.4rem);
 		color: white;

@@ -7,16 +7,22 @@ const Cabezera = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const menuItems = [
-    { href: "/proyectos", text: "Proyectos" },
     { href: "/about", text: "About" },
-    { href: "/noticias", text: "Noticias" },
+    { href: "/products", text: "Articulos" },
     { href: "/adminDash", text: "Admin" }
   ];
 
   return (
     <header className="header">
       <div className="header-container">
-        <Link href="/" className="home-link"><p className='x'>HOME</p></Link>
+<Link href="/">
+  <img
+    src="/img/SZ.png"
+    alt="Logo"
+    className="logo"
+    style={{ width: '10rem', height: '3.4rem', cursor: 'pointer' }}
+  />
+</Link>
         
         {/* Menú desktop (solo visible en pantallas grandes) */}
         <nav className="desktop-nav">
@@ -59,28 +65,21 @@ const Cabezera = () => {
       {isMenuOpen && <div className="backdrop" onClick={toggleMenu}></div>}
 
       <style jsx>{`
-        /* Variables */
-        :root {
-          --neon-blue: rgba(10, 175, 255, 0.8);
-          --glass-dark: rgba(20, 30, 40, 0.95);
-          --transition: all 0.3s ease-out;
+   .home-link {
+          font-weight: bold;
+          color: blue;
+          text-decoration: none;
+          transition: color 0.3s ease;
         }
-
-        /* Header principal */
-        .x{
-          background: linear-gradient(90deg, #fff, #0adaff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
+     
         .header {
-         
           position: fixed;
           top: 0;
           left: 0;
           width: 100%;
           background: var(--glass-dark);
           backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(10, 175, 255, 0.2);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.2);
           z-index: 4;
           font-size:1.5rem;
         }
@@ -95,19 +94,13 @@ const Cabezera = () => {
           margin: 0 auto;
         }
 
-        .home-link {
-        
-          text-shadow: 0 0 8px var(--neon-blue);
-        }
 
-        /* Menú desktop */
         .desktop-nav {
+          
           display: none;
           gap: 1.5rem;
         }
 
-    
-        /* Botón hamburguesa */
         .hamburger {
           display: flex;
           flex-direction: column;
@@ -124,7 +117,7 @@ const Cabezera = () => {
         .line {
           height: 2px;
           width: 100%;
-          background: white;
+          background-color: black; 
           transition: var(--transition);
         }
 
@@ -147,14 +140,13 @@ const Cabezera = () => {
           right: -260px;
           width: 250px;
           height: 100vh;
-          background: var(--glass-dark);
+      
           backdrop-filter: blur(10px);
-          border-left: 1px solid rgba(10, 175, 255, 0.2);
           z-index: 1000;
-          transition: var(--transition);
         }
         .mobile-menu.open {
           right: 0;
+          background: rgb(154, 218, 255);
         }
 
         .mobile-menu-content {
@@ -162,22 +154,19 @@ const Cabezera = () => {
           display: flex;
           flex-direction: column;
           gap: 1rem;
+          width: 100vh;
+
         }
 
         .mobile-link {
-          color: white;
           text-decoration: none;
           font-size: 1.1rem;
           padding: 0.5rem 1rem;
           border-radius: 4px;
           transition: var(--transition);
         }
-
-        .mobile-link:hover {
-          background: rgba(10, 175, 255, 0.1);
-          color: var(--neon-blue);
-        }
-
+     
+       
         /* Fondo borroso */
         .backdrop {
           position: fixed;
@@ -185,7 +174,8 @@ const Cabezera = () => {
           left: 0;
           width: 100%;
           height: 100vh;
-          background: rgba(0, 0, 0, 0.75);
+          background: rgba(0, 0, 0, 0.69);
+          color:white;
           backdrop-filter: blur(2px);
           z-index: 999;
         }
