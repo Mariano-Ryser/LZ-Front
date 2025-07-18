@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { AuthContext } from '../../components/auth/AuthProvider';
 import { useState, useContext } from 'react';
-import BlockPages from "./components/blockPages"
 
 export default function AdminDash() {
   const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -11,27 +10,49 @@ export default function AdminDash() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${baseURL}/admin/verify-key`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: accessKey }),
-        credentials: 'include', // 🔥 Asegura que el frontend envíe y reciba cookies
-      });
+  
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-      const data = await response.json();
-      if (data.success) {
-        login(); // Llamada al contexto para actualizar el estado de autenticación
-      } else {
-        setError('Clave incorrecta');
-      }
-    } catch (error) {
-      console.error("Detalles del error:", error);  // Imprimir el error completo
-      setError('Error de conexión'); //error en rojo en interfaz
+  if (!baseURL) {
+    console.error("❌ NEXT_PUBLIC_BACKEND_URL no está definida.");
+    setError('Error de configuración del sistema. Contacte al desarrollador capo.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${baseURL}/admin/verify-key`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ key: accessKey }),
+      credentials: 'include', // Envío y recepción de cookies
+    });
+
+    const contentType = response.headers.get('content-type');
+
+    if (!response.ok) {
+      const fallbackText = await response.text(); // Puede ser HTML
+      console.error(`❌ Error HTTP ${response.status}:`, fallbackText);
+      throw new Error(`HTTP ${response.status}`);
     }
-  };
+
+    const data = contentType?.includes('application/json')
+      ? await response.json()
+      : { success: false, message: 'Respuesta inesperada del servidor' };
+
+    if (data.success) {
+      login(); // Autenticación exitosa
+      setError(''); // Limpiar errores previos
+    } else {
+      setError(data.message || 'Clave incorrecta');
+    }
+  } catch (error) {
+    console.error('❌ Error en handleLogin:', error.message);
+    setError('Error de conexión o formato de respuesta');
+  }
+};
 
 
   if (!isAuthenticated) {
