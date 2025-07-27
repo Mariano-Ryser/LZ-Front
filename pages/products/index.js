@@ -1,8 +1,6 @@
-// components/products/listProduct.js
 import { useState, useContext } from 'react';
-import { AuthContext  } from '../../components/auth/AuthProvider';
+import { AuthContext } from '../../components/auth/AuthProvider';
 import { useProduct } from '../../services/useProducts';
-import { formatCurrency } from '../../utils/formatters';
 import { ProductCreator } from './productCreator';
 import { ProductEditor } from './productEditor';
 
@@ -10,176 +8,76 @@ export function ListProduct() {
   const {
     product,
     products,
-    total,
     loading,
     error,
     updateProduct,
     handleChange,
     createProduct,
     deleteProduct,
-    fetchProducts,
     setProductToEdit,
-    filters,
-    handleFilterChange,
-    applyFilters,
-    resetFilters
   } = useProduct();
 
-  const { isAuthenticated} = useContext(AuthContext);
-
-  // Estados de modales
+  const { isAuthenticated } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Opciones para los selects
-  const sortOptions = [
-    { value: '', label: 'Ordenar...' },
-    { value: 'price-asc', label: 'Precio ↑' },
-    { value: 'price-desc', label: 'Precio ↓' },
-    { value: 'name-asc', label: 'Nombre A-Z' },
-    { value: 'name-desc', label: 'Nombre Z-A' }
-  ];
-
-  // Obtener valores únicos para los filtros
-  const uniqueCategories = [...new Set(products.map(p => p.category))];
-  const uniqueSuppliers = [...new Set(products.map(p => p.supplier))];
-  const uniqueLugares = [...new Set(products.map(p => p.lugarDeVenta))];
-  const uniqueMarcas = [...new Set(products.map(p => p.marca))];
+  const filteredProducts = products.filter((p) =>
+    `${p.artikelName} ${p.artikelNumber}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="cyber-container">
-      {/* Filtros compactos */}
-              <button
-          className="cyber-small-button toggle-filters-button"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          {showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}
-        </button>
-        <div className={`cyber-filters-compact ${showFilters ? 'show' : ''}`}>
-        <select
-          className="cyber-filter-select"
-          name="sort"
-          value={filters.sort}
-          onChange={(e) => handleFilterChange('sort', e.target.value)}
-        >
-          {sortOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-
-        <select
-          className="cyber-filter-select"
-          name="category"
-          value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
-        >
-          <option value="">Categoría</option>
-          {uniqueCategories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-
-        <select
-          className="cyber-filter-select"
-          name="marca"
-          value={filters.marca}
-          onChange={(e) => handleFilterChange('marca', e.target.value)}
-        >
-          <option value="">Marca</option>
-          {uniqueMarcas.map(marca => (
-            <option key={marca} value={marca}>{marca}</option>
-          ))}
-        </select>
-
-        <button
-          className="cyber-small-button"
-          onClick={applyFilters}
-          disabled={loading}
-        >
-          Filtrar
-        </button>
-
-        <button
-          className="cyber-small-button reset"
-          onClick={resetFilters}
-          disabled={loading}
-        >
-          Limpiar
-        </button>
+    <div className="container">
       {isAuthenticated && (
-        <button
-          className="cyber-small-button add"
-          onClick={() => setShowModal(true)}
-        >
-          + Nuevo
-        </button> )}
+        <button onClick={() => setShowModal(true)} className="new-product-button">
+          + Nuevo Producto
+        </button>
+      )}
 
+      <div className="filters-container">
+        <input
+          type="text"
+          placeholder="Buscar por nombre o número"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
       </div>
 
-      {/* Lista tipo tabla con estilo elegante */}
-      <div className="cyber-excel-table">
-        <div className="cyber-excel-header">
-          <div className="cyber-excel-cell">Imagen</div>
-          <div className="cyber-excel-cell">Nombre</div>
-          <div className="cyber-excel-cell">Precio</div>
-          <div className="cyber-excel-cell">Categoría</div>
-          <div className="cyber-excel-cell">Proveedor</div>
-          <div className="cyber-excel-cell">Acciones</div>
+      <div className="products-table">
+        <div className="table-header">
+          <div className="table-cell">A-Name</div>
+          <div className="table-cell">A-Number</div>
+          <div className="table-cell">L-Platz</div>
         </div>
 
-        {products.length === 0 ? ( 
-          <div className="cyber-excel-row">
-            <div className="cyber-excel-cell" colSpan="6">
+        {filteredProducts.length === 0 ? (
+          <div className="table-row">
+            <div className="table-cell" colSpan="4">
               No se encontraron productos
             </div>
           </div>
-        ) : ( 
-          products.map((product) => (
+        ) : (
+          filteredProducts.map((product) => (
             <div
-             key={product._id}
-              className="cyber-excel-row"
+              key={product._id}
+              className="table-row"
               onClick={() => {
                 setEditingProduct(product);
-                setProductToEdit(product); // Establecer el producto a editar
+                setProductToEdit(product);
               }}
             >
-              <div className="cyber-excel-cell">
-                {product.imagen && (
-                  <img 
-                    src={product.imagen} 
-                    alt={product.name} 
-                    className="cyber-excel-image" 
-                  />
-                )}
-              </div>
-              <div className="cyber-excel-cell">{product.name}</div>
-              <div className="cyber-excel-cell">{formatCurrency(product.price)}</div>
-              <div className="cyber-excel-cell">{product.category}</div>
-              <div className="cyber-excel-cell">{product.supplier}</div>
-              <div className="cyber-excel-cell">
-              <button
-                className="cyber-excel-delete"
-                onClick={(e) => {
-                  e.stopPropagation();  // Detener la propagación para evitar que se active el evento de la fila
-                  deleteProduct(product._id);
-                }}
-                disabled={loading}
-              >
-                Eliminar
-              </button>
-              </div>
+              <div className="table-cell">{product.artikelName}</div>
+              <div className="table-cell">{product.artikelNumber}</div>
+              <div className="table-cell">{product.lagerPlatz}</div>
+        
             </div>
           ))
         )}
       </div>
 
-      <div className="cyber-total">
-        Total: {formatCurrency(total)} CRD
-      </div>
-
+     
+     
       {editingProduct && (
         <ProductEditor
           product={editingProduct}
@@ -196,14 +94,16 @@ export function ListProduct() {
         />
       )}
 
-      {showModal && ( 
+      {showModal && (
         <ProductCreator
           product={product}
           handleChange={handleChange}
-          createProduct={(e) => {
-            createProduct(e).then(() => {
-              if (!error) setShowModal(false);
-            });
+          createProduct={async (e) => {
+            e.preventDefault();
+            const result = await createProduct(e);
+            if (result?.success) {
+              setShowModal(false);
+            }
           }}
           loading={loading}
           error={error}
@@ -211,179 +111,110 @@ export function ListProduct() {
         />
       )}
 
-<style jsx>{`
-  .cyber-container {
+      <style jsx>{`
+  .container {
     padding: 1rem;
     max-width: 1200px;
     margin: 0 auto;
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
 
-  .cyber-filters-compact {
-    display: flex;
-    gap: 0.75rem;
+  .new-product-button {
     margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .cyber-filter-select {
-    padding: 0.75rem;
-    background: #333; /* Fondo oscuro para los selects */
-    border: 1px solid #444; /* Borde gris */
-    border-radius: 8px;
-    color: #fff; /* Texto blanco */
-    font-size: 01rem;
-    min-width: 150px;
-    transition: border-color 0.3s;
-  }
-
-  .cyber-filter-select:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-
-  .cyber-small-button {
-    padding: 0.6rem 1.2rem;
-    background: #007bff; /* Botones en azul */
-    border: 1px solid #0056b3;
+    padding: 0.5rem 1rem;
+    background: #007bff;
     color: white;
-    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.3s;
   }
 
-  .cyber-small-button:hover:not(:disabled) {
+  .new-product-button:hover {
     background: #0056b3;
   }
 
-  .cyber-excel-table {
+  .filters-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    min-width: 200px;
+    font-size: 1rem;
+  }
+
+  .products-table {
     width: 100%;
+    border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }
 
-  .cyber-excel-header {
+  .table-header {
     display: grid;
-    grid-template-columns: 100px 2fr 1fr 1fr 1fr 120px;
-    padding: 1rem;
-    font-weight: 600;
-    color: #ddd; /* Color de texto claro */
-    text-transform: uppercase;
-  }
-
-  .cyber-excel-row {
-    display: grid;
-    grid-template-columns: 100px 2fr 1fr 1fr 1fr 120px;
-    padding: 0.3rem;
-    border-top: 1px solid #444; /* Borde de las filas */
-    transition: background 0.3s;
-  }
-
-  .cyber-excel-row:hover {
-    background: #999; /* Fondo al hacer hover */
-  }
-
-  .cyber-excel-cell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.95rem;
-  }
-
-  .cyber-excel-image {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-  }
-
-  .cyber-excel-delete {
-    padding: 0.4rem 0.8rem;
-    background: #ff5733; /* Botón de eliminar en rojo */
-    border: 1px solid #ff5733;
-    color: white;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-
-  .cyber-excel-delete:hover:not(:disabled) {
-    background: #e04e2b; /* Color de hover para eliminar */
-  }
-
-  .cyber-total {
-    text-align: right;
+    grid-template-columns: repeat(3, 1fr);
+    background: #e0e0e0;
     font-weight: bold;
-    color:rgba(0, 0, 0, 0.83); /* Color verde para el total */
-    font-size: 1rem;
-    margin-top: 1.5rem;
+    padding: 0.5rem;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .table-row:hover {
+    background: #fafafa;
+  }
+
+  .table-cell {
+    padding: 0.5rem;
+    text-align: center;
   }
 
   @media (max-width: 768px) {
-    .cyber-excel-header,
-    .cyber-excel-row {
-      grid-template-columns: 80px 1fr 1fr 1fr 80px;
+    .table-header,
+    .table-row {
+      grid-template-columns: 2fr 1fr 1fr;
     }
 
-    .cyber-excel-cell:nth-child(4),
-    .cyber-excel-cell:nth-child(5) {
-      display: none;
+    .filters-container {
+      flex-direction: column;
+      align-items: stretch;
     }
   }
 
-  .toggle-filters-button {
-  margin-bottom: 1rem;
-}
+  @media (max-width: 480px) {
+    .table-header,
+    .table-row {
+      grid-template-columns: 1fr 1fr 1fr;
+      font-size: 0.75rem;
+    }
 
-/* Pantallas pequeñas */
-@media (max-width: 480px) {
-  .cyber-container {
-    padding: 1rem;
-  }
+    .table-cell {
+      padding: 0.25rem;
+    }
 
-  .cyber-filters-compact {
-    display: none;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+    .search-input {
+      font-size: 0.85rem;
+      padding: 0.4rem;
+    }
 
-  .cyber-filters-compact.show {
-    display: flex;
+    .new-product-button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
   }
-
-  .cyber-filter-select,
-  .cyber-small-button {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
-  }
-
-  .cyber-excel-header,
-  .cyber-excel-row {
-    grid-template-columns: 60px 2fr 1fr 80px;
-    font-size: 0.8rem;
-  }
-
-  .cyber-excel-cell {
-    font-size: 0.8rem;
-  }
-
-  .cyber-excel-image {
-    width: 40px;
-    height: 40px;
-  }
-
-  .cyber-excel-delete {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
-  }
-
-  .cyber-total {
-    font-size: 1rem;
-  }
-}
 `}</style>
     </div>
   );

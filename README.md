@@ -35,4 +35,8 @@ npm run dev
 
 Konstruktive Kritik ist immer willkommen. =D
 
+medida cel 380 x 700
+
 ° Mariano Ryser
+
+

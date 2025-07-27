@@ -16,12 +16,13 @@ const Cabezera = () => {
     <header className="header">
       <div className="header-container">
 <Link href="/">
-  <img
-    src="/img/SZ.png"
+  {/* <img
+    src="/img/kb-zurich.png"
     alt="Logo"
     className="logo"
-    style={{ width: '10rem', height: '3.4rem', cursor: 'pointer' }}
-  />
+    style={{ width: '10rem', height: '2.5rem', cursor: 'pointer' }}
+  /> */}
+  <h3 className="home-link">LZ</h3>
 </Link>
         
         {/* Menú desktop (solo visible en pantallas grandes) */}
@@ -65,11 +66,10 @@ const Cabezera = () => {
       {isMenuOpen && <div className="backdrop" onClick={toggleMenu}></div>}
 
       <style jsx>{`
-   .home-link {
-          font-weight: bold;
-          color: blue;
-          text-decoration: none;
-          transition: color 0.3s ease;
+        .logo {
+          cursor: pointer;
+          margin-bottom: -0.7rem;
+
         }
      
         .header {

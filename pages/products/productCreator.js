@@ -14,83 +14,56 @@ export const ProductCreator = ({
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2 className="modal-title">NUEVO PRODUCTO</h2>
+          <h2>Neuer Artikel</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
         <div className="modal-body">
+           <form onSubmit={createProduct}>
           <div className="input-group">
             <input
-              className="form-input"
               type="text"
-              name="name"
-              placeholder="NOMBRE"
-              value={product.name}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="input-group">
-            <input
-              className="form-input"
-              type="number"
-              name="price"
-              placeholder="PRECIO"
-              value={product.price}
+              name="artikelName"
+              placeholder="Artikel Name"
+              value={product.artikelName}
               onChange={handleChange}
               required
-              step="0.01"
-              min="0"
             />
           </div>
 
           <div className="input-group">
             <input
-              className="form-input"
               type="text"
-              name="category"
-              placeholder="CATEGORÍA"
-              value={product.category}
+              name="lagerPlatz"
+              placeholder="Lager Platz"
+              value={product.lagerPlatz}
               onChange={handleChange}
             />
           </div>
 
           <div className="input-group">
             <input
-              className="form-input"
               type="text"
-              name="supplier"
-              placeholder="PROVEEDOR"
-              value={product.supplier}
+              name="artikelNumber"
+              placeholder="Artikel Nummer"
+              value={product.artikelNumber}
               onChange={handleChange}
             />
           </div>
 
           <div className="input-group">
             <input
-              className="form-input"
               type="text"
-              name="lugarDeVenta"
-              placeholder="LUGAR DE VENTA"
-              value={product.lugarDeVenta}
+              name="description"
+              placeholder="Beschreibung"
+              value={product.description}
               onChange={handleChange}
             />
           </div>
 
           <div className="input-group">
-            <input
-              className="form-input"
-              type="text"
-              name="marca"
-              placeholder="MARCA"
-              value={product.marca}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="input-group file-input-group">
             <label className="file-label">
-              <span>Seleccionar imagen</span>
+              <span>Bilder</span>
               <input 
                 type="file" 
                 name="imagen" 
@@ -104,18 +77,18 @@ export const ProductCreator = ({
 
           {error && (
             <div className="error-message">
-              <div className="error-icon">⚠</div>
-              {error}
+              ⚠ {error}
             </div>
           )}
 
-          <button 
+         <button 
+            type="submit" 
             className="submit-button" 
-            onClick={createProduct}
             disabled={loading}
           >
-            {loading ? 'PROCESANDO...' : 'CREAR PRODUCTO'}
+            {loading ? 'Creando...' : 'Crear Producto'}
           </button>
+          </form>
         </div>
       </div>
 
@@ -126,7 +99,7 @@ export const ProductCreator = ({
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.7);
+          background: rgba(0, 0, 0, 0.5);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -135,89 +108,52 @@ export const ProductCreator = ({
         }
         
         .modal-container {
-          position: relative;
           width: 100%;
           max-width: 500px;
           background: white;
-          border-radius: 8px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-          overflow: hidden;
+          border: 1px solid black;
         }
         
         .modal-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 20px;
-          background: #f8f9fa;
-          border-bottom: 1px solid #e9ecef;
-        }
-        
-        .modal-title {
-          color: #000;
-          font-size: 18px;
-          font-weight: 600;
-          margin: 0;
+          padding: 1rem;
+          border-bottom: 1px solid black;
         }
         
         .close-button {
           background: none;
           border: none;
-          color: #6c757d;
-          font-size: 24px;
+          font-size: 1.5rem;
           cursor: pointer;
           padding: 0;
           line-height: 1;
         }
         
         .modal-body {
-          padding: 20px;
+          padding: 1rem;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 1rem;
         }
         
         .input-group {
           width: 100%;
         }
         
-        .form-input {
+        input {
           width: 100%;
-          padding: 12px 15px;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          font-size: 14px;
-          color: #000;
-          background-color: #fff;
-          transition: border-color 0.15s ease-in-out;
-        }
-        
-        .form-input:focus {
-          outline: none;
-          border-color: #80bdff;
-          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-        
-        .file-input-group {
-          margin-top: 8px;
+          padding: 0.5rem;
+          border: 1px solid black;
         }
         
         .file-label {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 12px 15px;
-          background-color:rgb(46, 50, 53);
-          border: 1px dashed #ced4da;
-          border-radius: 4px;
+          display: block;
+          padding: 0.5rem;
+          border: 1px solid black;
+          text-align: center;
           cursor: pointer;
-          color: #495057;
-          font-size: 14px;
-          transition: all 0.2s;
-        }
-        
-        .file-label:hover {
-          background-color:rgb(45, 126, 79);
         }
         
         .file-input {
@@ -225,73 +161,32 @@ export const ProductCreator = ({
         }
         
         .error-message {
-          display: flex;
-          align-items: center;
-          padding: 12px 15px;
-          background-color: #f8d7da;
-          border: 1px solid #f5c6cb;
-          border-radius: 4px;
-          color: #721c24;
-          font-size: 14px;
-          margin-top: 8px;
-        }
-        
-        .error-icon {
-          margin-right: 8px;
-          font-size: 16px;
+          padding: 0.5rem;
+          border: 1px solid black;
+          background: #ffebee;
+          color: #b71c1c;
         }
         
         .submit-button {
           width: 100%;
-          padding: 12px 15px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          font-size: 16px;
-          font-weight: 500;
+          padding: 0.75rem;
+          background: #f0f0f0;
+          border: 1px solid black;
           cursor: pointer;
-          transition: background-color 0.2s;
         }
         
-        .submit-button:hover {
-          background-color: #0069d9;
+        .submit-button:hover:not(:disabled) {
+          background: #e0e0e0;
         }
         
         .submit-button:disabled {
-          background-color: #6c757d;
           cursor: not-allowed;
+          opacity: 0.7;
         }
         
         @media (max-width: 480px) {
           .modal-overlay {
-            padding: 10px;
-          }
-          
-          .modal-container {
-            max-width: 100%;
-          }
-          
-          .modal-header {
-            padding: 12px 15px;
-          }
-          
-          .modal-title {
-            font-size: 16px;
-          }
-          
-          .modal-body {
-            padding: 15px;
-          }
-          
-          .form-input {
-            padding: 10px 12px;
-            font-size: 13px;
-          }
-          
-          .submit-button {
-            padding: 10px 12px;
-            font-size: 14px;
+            padding: 0.5rem;
           }
         }
       `}</style>

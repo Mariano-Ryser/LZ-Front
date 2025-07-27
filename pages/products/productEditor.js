@@ -1,5 +1,6 @@
 // components/products/productEditor.js
-import { useState , useEffect} from 'react';
+import { useState , useContext, useEffect} from 'react';
+import { AuthContext } from '../../components/auth/AuthProvider';
 
 export const ProductEditor = ({ 
   product, 
@@ -12,32 +13,13 @@ export const ProductEditor = ({
 }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const { isAuthenticated } = useContext(AuthContext);
    // Verifica si el producto es válido antes de asignar el estado inicial
     const [localProduct, setLocalProduct] = useState(() => ({
       ...product,
-      price: product?.price ? convertDecimal128ToNumber(product.price) : 0  // Asegúrate de tener un valor por defecto
     })); 
-    //aqui
   
- // Función para convertir Decimal128 a número
- function convertDecimal128ToNumber(value) {
-  if (!value) return 0;
-  // Si es un objeto Decimal128 de MongoDB
-  if (value && typeof value === 'object' && '$numberDecimal' in value) {
-    return parseFloat(value.$numberDecimal);
-  }
-  // Si ya es un número o string numérico
-  return Number(value) || 0;
-}
-  // Asegúrate de que localProduct se actualice correctamente cuando el `product` cambie
-  useEffect(() => {
-    if (product) {
-      setLocalProduct({
-        ...product,
-        price: product?.price ? convertDecimal128ToNumber(product.price) : 0
-      });
-    }
-  }, [product]);
+  
 
   const handleLocalChange = (e) => {
       const { name, value, files } = e.target;
@@ -50,7 +32,7 @@ export const ProductEditor = ({
       } else {
         setLocalProduct(prev => ({
           ...prev,
-          [name]: name === 'price' ? Number(value) : value 
+           [name]: value 
         }));
       }
       
@@ -67,6 +49,7 @@ export const ProductEditor = ({
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
+       
           <h2 className="modal-title">EDITAR PRODUCTO</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
@@ -82,83 +65,59 @@ export const ProductEditor = ({
             )}
           </div>
           <div className="input-group">
-            <label>Nombre</label>
+            <label>Artikel Name</label>
             <input
               className="form-input"
               type="text"
-              name="name"
-              placeholder="Nombre del producto"
-              value={localProduct.name || ''}
+              name="artikelName"
+              placeholder="Artikel Name"
+              value={localProduct.artikelName || ''}
               onChange={handleLocalChange}
               required
             />
           </div>
 
-          <div className="input-group">
-            <label>Precio</label>
-            <input
-              className="form-input"
-              type="number"
-              name="price"
-              placeholder="Precio"
-              value={localProduct.price || ''}
-              onChange={handleLocalChange}
-              step="0.01"
-              min="0"
-            />
-          </div>
 
           <div className="input-group">
-            <label>Categoría</label>
+            <label>lagerPlatz</label>
             <input
               className="form-input"
               type="text"
-              name="category"
-              placeholder="Categoría"
-              value={localProduct.category || ''}
+              name="lagerPlatz"
+              placeholder="lagerPlatz"
+              value={localProduct.lagerPlatz || ''}
               onChange={handleLocalChange}
             />
           </div>
 
           <div className="input-group">
-            <label>Proveedor</label>
+            <label>artikelNumber</label>
             <input
               className="form-input"
               type="text"
-              name="supplier"
-              placeholder="Proveedor"
-              value={localProduct.supplier || ''}
+              name="artikelNumber"
+              placeholder="artikelNumber"
+              value={localProduct.artikelNumber || ''}
               onChange={handleLocalChange}
             />
           </div>
 
           <div className="input-group">
-            <label>Lugar de Venta</label>
+            <label>Beschreibung</label>
             <input
               className="form-input"
               type="text"
-              name="lugarDeVenta"
-              placeholder="Lugar de Venta"
-              value={localProduct.lugarDeVenta || ''}
+              name="description"
+              placeholder="Beschreibung"
+              value={localProduct.description || ''}
               onChange={handleLocalChange}
             />
           </div>
 
-          <div className="input-group">
-            <label>Marca</label>
-            <input
-              className="form-input"
-              type="text"
-              name="marca"
-              placeholder="Marca"
-              value={localProduct.marca || ''}
-              onChange={handleLocalChange}
-            />
-          </div>
 
           <div className="input-group file-input-group">
             <label className="file-label">
-              <span>Cambiar imagen</span>
+              <span>Bild ändern</span>
               <input 
                 type="file" 
                 name="imagen" 
@@ -187,7 +146,9 @@ export const ProductEditor = ({
               {error}
             </div>
           )}
-
+    {isAuthenticated && (
+     
+     
             <div className="button-group">
             <button 
               className="submit-button update"
@@ -206,7 +167,7 @@ export const ProductEditor = ({
               ELIMINAR PRODUCTO
             </button>
           </div>
-
+ )}
           {showDeleteConfirm && (
             <div className="delete-confirm-modal">
               <div className="delete-confirm-content">
