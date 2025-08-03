@@ -1,57 +1,165 @@
-// components/MapaAlmacen.js
-export default function MapaAlmacen({ ubicacion }) {
+export default function MapaAlmacen({ ubicacionActiva }) {
   return (
     <div className="mapa-container">
       <div className="mapa">
-        {Array.from({ length: 5 }, (_, fila) => (
-          <div className="fila" key={fila}>
-            {Array.from({ length: 5 }, (_, col) => {
-              const pos = `Estante ${String.fromCharCode(65 + fila)}${col + 1}`;
-              const esActual = pos === ubicacion;
-              return (
-                <div
-                  key={pos}
-                  className={`celda ${esActual ? 'activo' : ''}`}
-                  title={pos}
-                >
-                  {esActual ? '📦' : ''}
+
+        <div className={`estante ${ubicacionActiva === "10A-A01021" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "0%"
+          }}>
+                  <p>10A-A01021</p>
                 </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+          <div className={`estante ${ubicacionActiva === "10A-A01031" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "5.5%"
+          }}>
+                  <p>10A-A01031</p>
+                </div>
+           <div className={`estante ${ubicacionActiva === "10A-A01041" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "11%"
+          }}>
+                  <p>10A-A01041</p>
+        </div>
+
+        <div className={`estante ${ubicacionActiva === "10A-A01051" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "16.5%"
+          }}>
+              <p> 10A-A01051</p>
+            </div>
+          <div className={`estante ${ubicacionActiva === "10B-A01021" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "22%"
+          }}>
+                  <p>10B-A01021</p>
+                </div>
+        <div className={`estante ${ubicacionActiva === "10B-A01031" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "27.5%"
+          }}>
+            <p> 10B-A01031</p>
+                </div>
+        <div className={`estante ${ubicacionActiva === "10B-A01041" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            left: "33%"
+          }}>
+            <p> 10B-A01041</p> 
+        </div>
+
+         
+{/* ESTANTERIA 2 */} {/* ESTANTERIA 2 */} {/* ESTANTERIA 2 */} {/* ESTANTERIA 2 */}
+
+        <div className={`estante ${ubicacionActiva === "10A-A01021" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "0%"
+          }}>
+                  <p>10A-A01021</p>
+                </div>
+          <div className={`estante ${ubicacionActiva === "10A-A01031" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "5.5%"
+          }}>
+                  <p>10A-A01031</p>
+                </div>
+           <div className={`estante ${ubicacionActiva === "10A-A01041" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "11%"
+          }}>
+                  <p>10A-A01041</p>
+        </div>
+
+        <div className={`estante ${ubicacionActiva === "10A-A01051" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "16.5%"
+          }}>
+              <p> 10A-A01051</p>
+            </div>
+          <div className={`estante ${ubicacionActiva === "10B-A01021" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "22%"
+          }}>
+                  <p>10B-A01021</p>
+                </div>
+        <div className={`estante ${ubicacionActiva === "10B-A01031" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "27.5%"
+          }}>
+            <p> 10B-A01031</p>
+                </div>
+        <div className={`estante ${ubicacionActiva === "10B-A01041" ? "activo" : ""}`}  style={{
+            width: "5.5%",
+            height: "2.1%",
+            top: "0%",
+            right: "33%"
+          }}>
+            <p> 10B-A01041</p> 
+        </div>
+        
+    </div>
 
       <style jsx>{`
-        .mapa-container {
-          margin-top: 20px;
+        p {
+          font-family: 'Courier New', Courier, monospace;
+           font-size: 1.1vw; 
+          color: #000;;
+        } 
+          .mapa-container {
+            width: 100%;
+            max-width: 40rem;
+            margin: 0 auto;
+            aspect-ratio: 1 / 2; /* o lo que se ajuste a tu plano */
+            position: relative;
+          }
+          .mapa {
+            position: relative;
+            width: 100%;
+            max-width: 40rem;
+            height: 74%;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+          }
+        .estante {
+          position: absolute;
+          display: inline-block;
+          border: 1px solid #000;
+          background-color: #e0e0e0;
+          padding: 0rem;
         }
-        .mapa {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-          background: #f0f0f0;
-          padding: 10px;
-          border-radius: 10px;
+        .estante:hover {
+          background-color: #65f704ff;
         }
-        .fila {
-          display: flex;
-          gap: 5px;
-        }
-        .celda {
-          width: 40px;
-          height: 40px;
-          background: #ccc;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
-          font-size: 20px;
-        }
-        .celda.activo {
-          background: #2196f3;
+        .activo {
+          background-color: #4caf50;
           color: white;
           font-weight: bold;
+          box-shadow: 0 0 10px #4caf50;
         }
       `}</style>
     </div>

@@ -7,10 +7,18 @@ export default function About() {
       <div className="cyber-about-container">
         <div className="cyber-about-content">
           <div className="cyber-logo-container">
-           <h1>LZ LAGER</h1>
+        
+                     <img
+    src="/img/stern.png"
+    alt="Logo"
+    className="logo"
+    style={{ width: '10rem', height: '10.5rem', cursor: 'pointer' }}
+  />
           </div>
+ 
           
           <div className="cyber-text-grid">
+   
           <p className="cyber-text">
   Im Labyrinth der Logistik, wo verlorene Artikel zu Legenden werden und Effizienz oft nur ein Gerücht ist, habe ich ein Tool entwickelt, das tatsächlich funktioniert: Eine präzise, blitzschnelle Artikelsuchmaschine für Lagerumgebungen. Keine Geisterpaletten mehr. Keine rätselhaften Regale. Nur Ergebnisse.
 </p>
@@ -34,12 +42,24 @@ export default function About() {
       </div>
 
       <style jsx>{`
+       .logo {
+          height: 10.5rem;
+          animation: spin 10s linear infinite;
+        }
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
         .cyber-about-container {
           position: relative;
           min-height: 80vh;
           max-width:900px;
           margin:auto;
-          padding: 2rem;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -48,7 +68,7 @@ export default function About() {
         
         .cyber-about-content {
           position: relative;
-          padding: 2rem;
+          padding: 1rem;
           border-radius: 5px;
           backdrop-filter: blur(10px);
         
@@ -58,7 +78,7 @@ export default function About() {
           position: relative;
           display: flex;
           justify-content: center;
-          margin-bottom: 2rem;
+          margin-bottom: 0rem;
         }
         
       
@@ -76,70 +96,9 @@ export default function About() {
           padding-left: 1rem;
         }
         
-        .cyber-text::before {
-          content: ">";
-          position: absolute;
-          left: 0;
-          color: rgba(10, 175, 255, 0.7);
-        }
+
         
-        .cyber-social-links {
-          display: flex;
-          justify-content: center;
-          gap: 1.5rem;
-          margin-top: 2rem;
-        }
-        
-        .cyber-social-link {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.8rem 1.5rem;
-          background: rgba(10, 50, 80, 0.5);
-          border: 1px solid rgba(10, 175, 255, 0.3);
-          border-radius: 3px;
-          text-decoration: none;
-          font-family: 'Courier New', monospace;
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .cyber-social-link:hover {
-          background: rgba(10, 80, 120, 0.7);
-          box-shadow: 0 0 15px rgba(10, 175, 255, 0.5);
-          transform: translateY(-2px);
-        }
-        
-        .cyber-social-icon {
-          color: rgba(10, 175, 255, 0.9);
-          font-weight: bold;
-        }
-        
-        .cyber-social-text {
-          position: relative;
-          z-index: 2;
-        }
-        
-        .cyber-social-link::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-          );
-          transition: all 0.5s ease;
-        }
-        
-        .cyber-social-link:hover::after {
-          left: 100%;
-        }
+  
         
         @media (max-width: 768px) {
           .cyber-about-container {

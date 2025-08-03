@@ -7,22 +7,23 @@ const Cabezera = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const menuItems = [
-    { href: "/about", text: "About" },
-    { href: "/products", text: "Articulos" },
-    { href: "/adminDash", text: "Admin" }
+    { href: "/about", text: "Info" },
+    { href: "/products", text: "Artikel" },
+    { href: "/mapa", text: "Map" },
+    { href: "/adminDash", text: "Admin" },
   ];
 
   return (
     <header className="header">
       <div className="header-container">
 <Link href="/">
-  {/* <img
-    src="/img/kb-zurich.png"
+  <img
+    src="/img/ninja-face.png"
     alt="Logo"
     className="logo"
-    style={{ width: '10rem', height: '2.5rem', cursor: 'pointer' }}
-  /> */}
-  <h3 className="home-link">LZ</h3>
+    style={{ width: '4rem', height: '3rem', cursor: 'pointer' }}
+  />
+  {/* <h3 className="home-link">LZ</h3> */}
 </Link>
         
         {/* Menú desktop (solo visible en pantallas grandes) */}
@@ -69,7 +70,11 @@ const Cabezera = () => {
         .logo {
           cursor: pointer;
           margin-bottom: -0.7rem;
-
+          transition:0.2s ease-in-out;
+        }
+        .logo:hover {
+           filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.05));
+           transform: rotateZ(3deg) scale(1.06);
         }
      
         .header {

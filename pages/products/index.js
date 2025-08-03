@@ -179,6 +179,7 @@ export function ListProduct() {
 
   .table-cell {
     padding: 0.5rem;
+    
     text-align: center;
   }
 
@@ -194,7 +195,7 @@ export function ListProduct() {
     }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 780px) {
     .table-header,
     .table-row {
       grid-template-columns: 1fr 1fr 1fr;
@@ -203,7 +204,10 @@ export function ListProduct() {
 
     .table-cell {
       padding: 0.25rem;
+     font-size: 1rem;
+    text-align: center;
     }
+    
 
     .search-input {
       font-size: 0.85rem;

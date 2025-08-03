@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext  } from 'react';
 import { useProduct } from '../services/useProducts';
-
+import MapaAlmacen from '../components/MapaAlmacen';
 export default function Home() {
+
+
   const {
     products,
     loading,
@@ -13,6 +15,7 @@ export default function Home() {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [articuloSeleccionado, setArticuloSeleccionado] = useState(null);
 
+
   const handleBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
     setBusqueda(texto);
@@ -20,7 +23,7 @@ export default function Home() {
     if (!texto.trim()) {
       setResultados([]);
       return;
-    }
+    } 
 
     const filtrados = products.filter((articulo) =>
       articulo.artikelNumber?.toLowerCase().startsWith(texto) ||
@@ -42,17 +45,19 @@ export default function Home() {
 
   return (
     <>
+
       <div className="container">
         <div className="card">
-          <h2>Artikelfinder</h2>
+    
+              <h2>Artikel </h2>
           <input
-            type="text"
-            placeholder="N° artículo o artikelName"
-            value={busqueda}
-            onChange={handleBusqueda}
+          type="text"
+          placeholder="N° Articulo o artikelName"
+          value={busqueda}
+          onChange={handleBusqueda}
           />
-
-          {loading && <p>Cargando artículos...</p>}
+       
+          {loading && <p>Cargando artículos...</p > }
           {error && <p>Error al cargar productos.</p>}
 
           {resultados.length > 0 && (
@@ -84,7 +89,7 @@ export default function Home() {
         <div className="modal-overlay" onClick={cerrarModal}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <button className="cerrar" onClick={cerrarModal}>×</button>
-            <h3>{articuloSeleccionado.artikelName}</h3>
+            <h3 className='hModal'>{articuloSeleccionado.artikelName}</h3>
             
             {articuloSeleccionado.imagen && typeof articuloSeleccionado.imagen === 'string' && (
   <img
@@ -92,31 +97,42 @@ export default function Home() {
     alt={articuloSeleccionado.artikelName}
     className="product-image"
   />
+  
 )}
 
-            <p><strong>A-N°:</strong> {articuloSeleccionado.artikelNumber}</p>
-            <p><strong>Lagerplatz:</strong> {articuloSeleccionado.lagerPlatz}</p>
+            <p className='pModal'><strong>A-N°:</strong> {articuloSeleccionado.artikelNumber}</p>
+            <hr />
+            <p className='pModal'><strong>Lagerplatz:</strong> {articuloSeleccionado.lagerPlatz}</p>
+
+          <MapaAlmacen ubicacionActiva={articuloSeleccionado?.lagerPlatz} />
+
+
           </div>
+ 
         </div>
+        
       )}
 
       <style jsx>{`
-        .product-image {
-  width: 100%;
-  max-width: 300px;
-  margin: 1rem auto;
-  display: block;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  object-fit: cover;
-}
+        
+        .product-image {border-radius: 5px;
+        width: 100%;
+        max-width: 300px;
+        margin: 1rem auto;
+        display: block;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        object-fit: cover;
+      }
         .item {
-          padding: 10px;
+          padding: 16px;
           margin-bottom: 5px;
-          border-radius: 5px;
           transition: background 0.3s ease;
         }
-        .item:hover {}
+        .item:hover {
+          background-color: rgba(255, 255, 255, 1);
+          transform: scale(1.02);
+        }
         h2 {
           margin: 0 0 15px 0;
         }
@@ -131,7 +147,10 @@ export default function Home() {
           margin-top: 1rem;
         }
         .card {
-          background-color: rgba(197, 231, 255, 1);
+          
+          border-radius: 5px;
+          background-color: rgba(178, 223, 255, 1);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 5px rgba(0, 0, 0, 0);
           padding: 30px;
           width: 800px;
           text-align: center;
@@ -142,7 +161,13 @@ export default function Home() {
           padding: 17px;
           width: 100%;
           margin-bottom: 10px;
-          border: 1px solid #ccc;
+          border: 2px solid rgba(178, 223, 255, 1);
+          transition: 0.3s;
+          border-radius: 10px;
+        }
+        input:hover {
+          border: 2px solid rgba(0, 0, 0, 1);
+          border-radius: 10px;
         }
         .lista-resultados {
           text-align: left;
@@ -158,14 +183,17 @@ export default function Home() {
         .modal {
           background: rgba(255, 255, 255, 1);
           border: 1px solid rgba(189, 189, 189, 0.06);
-          box-shadow: 10px 10px 25.4px 0.5px rgba(0, 0, 0, 0.07),
-          -5px -6px 25.4px 5px rgba(0, 0, 0, 0.07);
+          box-shadow: 10px 10px 25.4px 0.5px rgba(0, 0, 0, 0.35),
+          -5px -6px 25.4px 5px rgba(0, 0, 0, 0.25);
           padding: 30px;
           margin: 6rem 2rem auto;
           width: 700px;
           position: relative;
           color: black;
           text-align: center;
+          border-radius: 2px;
+          max-height: 80vh; 
+          overflow-y: auto;
         }
         .modal .cerrar {
           position: absolute;
@@ -177,7 +205,77 @@ export default function Home() {
           color: black;
           cursor: pointer;
         }
-      `}</style>
+
+          @media (max-width: 768px) {
+            .hModal {
+          font-size: 16px;
+          margin: 0 0 15px 0;
+        }
+        .pModal {
+          font-size: 18px;
+          margin: 0 0 15px 0;
+        }
+            .splash-image {
+  max-width: 250px;
+  max-height: 250px;
+  object-fit: contain;
+    animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+             input {
+          font-family: inherit;
+          font-size: 20px;
+          padding: 10px;
+          width: 100%;
+          margin-bottom: 5px;
+          border-radius: 5px;
+          border: 2px solid #ccc;
+        }
+                h2 {
+                  font-size:25px;
+          margin: 0 0 10px 0;
+        }
+        p {
+          display: inline;
+          font-size: 20px;
+          margin: 0px 0px 0px 0px;
+        }
+        .container {
+          display: flex;
+          justify-content: center;
+          margin-top: 1rem;
+        }
+      .card {
+          background-color: rgba(178, 223, 255, 1);
+          padding: 20px 10px 10px 10px;
+          width: 100%;
+          text-align: center;
+        }
+           .item {
+          padding: 6px;
+          margin-bottom: 2px;
+          transition: background 0.3s ease;
+        }
+    
+        .item:hover {
+          background-color: rgba(255, 255, 255, 0);
+          transform: scale(1);
+        }
+  }
+
+  @media (max-width: 480px) {
+  
+     }
+        `}</style>
     </>
-  );
+  ); 
+
+
 }
