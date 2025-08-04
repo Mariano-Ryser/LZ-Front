@@ -123,7 +123,6 @@ export const ProductEditor = ({
                 name="imagen" 
                 onChange={handleLocalChange}
                 accept="image/*"
-                capture="environment"
                 className="file-input"
               />
  
