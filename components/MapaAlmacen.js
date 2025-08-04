@@ -127,7 +127,7 @@ export default function MapaAlmacen({ ubicacionActiva }) {
       <style jsx>{`
         p {
           font-family: 'Courier New', Courier, monospace;
-           font-size: 1.1vw; 
+           font-size: 0.5vw; 
           color: #000;;
         } 
           .mapa-container {
@@ -136,12 +136,13 @@ export default function MapaAlmacen({ ubicacionActiva }) {
             margin: 0 auto;
             aspect-ratio: 1 / 2; /* o lo que se ajuste a tu plano */
             position: relative;
+            height: 80vh;
           }
           .mapa {
             position: relative;
             width: 100%;
             max-width: 40rem;
-            height: 74%;
+            height: 100%;
             margin: 0 auto;
             border: 1px solid #ccc;
           }

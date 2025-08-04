@@ -113,7 +113,7 @@ export function ListProduct() {
 
       <style jsx>{`
   .container {
-    padding: 1rem;
+    padding: 0rem;
     max-width: 1200px;
     margin: 0 auto;
   }
@@ -203,15 +203,15 @@ export function ListProduct() {
     }
 
     .table-cell {
-      padding: 0.25rem;
-     font-size: 1rem;
+      padding: 0.20rem;
+     font-size: 0.76rem;
     text-align: center;
     }
     
 
     .search-input {
       font-size: 0.85rem;
-      padding: 0.4rem;
+      padding: 0.5rem;
     }
 
     .new-product-button {

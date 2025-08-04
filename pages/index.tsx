@@ -104,7 +104,7 @@ export default function Home() {
             <hr />
             <p className='pModal'><strong>Lagerplatz:</strong> {articuloSeleccionado.lagerPlatz}</p>
 
-          <MapaAlmacen ubicacionActiva={articuloSeleccionado?.lagerPlatz} />
+          {/* <MapaAlmacen ubicacionActiva={articuloSeleccionado?.lagerPlatz} /> */}
 
 
           </div>
