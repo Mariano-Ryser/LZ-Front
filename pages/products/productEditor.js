@@ -1,6 +1,7 @@
 // components/products/productEditor.js
 import { useState , useContext, useEffect} from 'react';
 import { AuthContext } from '../../components/auth/AuthProvider';
+import MapaAlmacen from '../../components/MapaAlmacen';
 
 export const ProductEditor = ({ 
   product, 
@@ -44,6 +45,7 @@ export const ProductEditor = ({
       e.preventDefault();
       updateProduct(e, localProduct); 
   };
+  const [ubicacionActiva, setUbicacionActiva] = useState(null);
 
   return (
     <div className="modal-overlay">
@@ -51,6 +53,7 @@ export const ProductEditor = ({
         <div className="modal-header">
        
           <h2 className="modal-title">EDITAR PRODUCTO</h2>
+         
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
@@ -117,7 +120,7 @@ export const ProductEditor = ({
 
           <div className="input-group file-input-group">
             <label className="file-label">
-              <span>Bild ändern</span>
+              <span>Bild ändern 10O-B03041</span>
               <input 
                 type="file" 
                 name="imagen" 
@@ -127,6 +130,7 @@ export const ProductEditor = ({
               />
  
             </label>
+          
             {localProduct.imagen && localProduct.imagen instanceof File && (
   <div className="preview-container">
     <p >Vista previa de la imagen:</p>
@@ -136,6 +140,7 @@ export const ProductEditor = ({
       className="preview-image"
     />
   </div>
+  
 )}
           </div>
 
