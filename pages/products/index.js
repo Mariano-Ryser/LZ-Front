@@ -97,7 +97,6 @@ export function ListProduct() {
   /></div>
     )}
   </div>
- 
 
   <div className="product-content">
     <h3 className="product-name">{product.artikelName}</h3>

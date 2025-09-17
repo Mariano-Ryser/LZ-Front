@@ -120,7 +120,7 @@ export const ProductEditor = ({
 
           <div className="input-group file-input-group">
             <label className="file-label">
-              <span>Bild ändern 10O-B03041</span>
+              <span>Bild ändern</span>
               <input 
                 type="file" 
                 name="imagen" 

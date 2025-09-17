@@ -5,13 +5,14 @@ import MapaAlmacen from '../components/MapaAlmacen';
 export default function Home() {
   const { products, loading, error } = useProduct();
 
-  const [busqueda, setBusqueda] = useState('');
-  const [resultados, setResultados] = useState([]);
-  const [modalAbierto, setModalAbierto] = useState(false);
-  const [articuloSeleccionado, setArticuloSeleccionado] = useState(null);
-  const [ubicacionActiva, setUbicacionActiva] = useState(null);
-  const [modalUbicacionAbierto, setModalUbicacionAbierto] = useState(false);
-  const [articulosUbicacion, setArticulosUbicacion] = useState([]);
+  const [busqueda, setBusqueda] = useState('');   // Texto de búsqueda ingresado por el usuario
+  const [resultados, setResultados] = useState([]);   // Resultados de búsqueda filtrados
+  const [modalAbierto, setModalAbierto] = useState(false);  // Modal para mostrar detalles del artículo seleccionado
+  const [articuloSeleccionado, setArticuloSeleccionado] = useState(null);   // Artículo seleccionado para mostrar en el modal
+  const [ubicacionActiva, setUbicacionActiva] = useState(null); // Ubicación del artículo seleccionado
+  const [modalUbicacionAbierto, setModalUbicacionAbierto] = useState(false); // Modal para mostrar artículos en una ubicación específica
+
+  const [articulosUbicacion, setArticulosUbicacion] = useState([]); // Artículos en la ubicación seleccionada
 
   const handleBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();

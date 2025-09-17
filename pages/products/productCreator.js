@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export const ProductCreator = ({ 
   product = {}, 
@@ -8,13 +8,23 @@ export const ProductCreator = ({
   error,
   onClose 
 }) => {
+
+    // Normalizamos el estado para que nunca sean undefined
+  const safeProduct = {
+    artikelName: product.artikelName || "",
+    lagerPlatz: product.lagerPlatz || "",
+    artikelNumber: product.artikelNumber || "",
+    description: product.description || "",
+    imagen: product.imagen || null
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal-container">
         
         {/* HEADER */}
         <div className="modal-header">
-          <h2>➕ Neuer Artikel</h2>
+          <h2>➕ Nuevo Producto</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
@@ -23,41 +33,47 @@ export const ProductCreator = ({
           <form onSubmit={createProduct} className="form">
             
             <div className="input-group">
+              <label>Nombre del artículo</label>
               <input
                 type="text"
                 name="artikelName"
-                placeholder="Artikel Name"
-                value={product.artikelName}
+                placeholder="Ej: Taladro Bosch"
+                value={safeProduct.artikelName}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className="input-group">
-              <input
-                type="text"
-                name="lagerPlatz"
-                placeholder="Lager Platz"
-                value={product.lagerPlatz}
-                onChange={handleChange}
-              />
+            <div className="input-row">
+              <div className="input-group">
+                <label>Lugar en almacén</label>
+                <input
+                  type="text"
+                  name="lagerPlatz"
+                  placeholder="Ej: A-12"
+                  value={safeProduct.lagerPlatz}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Número de artículo</label>
+                <input
+                  type="text"
+                  name="artikelNumber"
+                  placeholder="Ej: 345-AB"
+                  value={safeProduct.artikelNumber}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div className="input-group">
-              <input
-                type="text"
-                name="artikelNumber"
-                placeholder="Artikel Nummer"
-                value={product.artikelNumber}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="input-group">
+              <label>Descripción</label>
               <textarea
                 name="description"
-                placeholder="Beschreibung"
-                value={product.description}
+                placeholder="Escribe una breve descripción..."
+                value={safeProduct.description}
                 onChange={handleChange}
                 rows="3"
               />
@@ -65,13 +81,12 @@ export const ProductCreator = ({
 
             <div className="input-group file-upload">
               <label className="file-label">
-                📷 Bild hochladen
+                📷 Subir imagen
                 <input 
                   type="file" 
                   name="imagen" 
                   onChange={handleChange} 
                   accept="image/*"
-                  capture="environment"
                   className="file-input"
                 />
               </label>
@@ -110,10 +125,10 @@ export const ProductCreator = ({
         /* Container */
         .modal-container {
           width: 100%;
-          max-width: 480px;
+          max-width: 520px;
           background: #fff;
-          border-radius: 16px;
-          box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+          border-radius: 14px;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.15);
           overflow: hidden;
           animation: fadeIn 0.3s ease-out;
         }
@@ -129,13 +144,13 @@ export const ProductCreator = ({
           justify-content: space-between;
           align-items: center;
           padding: 1rem 1.25rem;
-          background: #f9fafb;
+          background: #f3f4f6;
           border-bottom: 1px solid #e5e7eb;
         }
 
         .modal-header h2 {
           margin: 0;
-          font-size: 1.25rem;
+          font-size: 1.3rem;
           font-weight: 600;
           color: #111827;
         }
@@ -143,7 +158,7 @@ export const ProductCreator = ({
         .close-button {
           background: none;
           border: none;
-          font-size: 1.5rem;
+          font-size: 1.6rem;
           cursor: pointer;
           color: #6b7280;
           transition: color 0.2s;
@@ -155,22 +170,34 @@ export const ProductCreator = ({
 
         /* Body */
         .modal-body {
-          padding: 1.25rem;
+          padding: 1.5rem;
         }
 
         .form {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 1.25rem;
         }
 
         /* Inputs */
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+
+        label {
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #374151;
+        }
+
         .input-group input,
         .input-group textarea {
           width: 100%;
-          padding: 0.75rem 1rem;
+          padding: 0.7rem 1rem;
           border: 1px solid #d1d5db;
-          border-radius: 10px;
+          border-radius: 8px;
           font-size: 0.95rem;
           transition: border 0.2s, box-shadow 0.2s;
         }
@@ -178,7 +205,7 @@ export const ProductCreator = ({
         .input-group input:focus,
         .input-group textarea:focus {
           border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
           outline: none;
         }
 
@@ -189,7 +216,7 @@ export const ProductCreator = ({
         /* File upload */
         .file-label {
           display: block;
-          padding: 0.75rem;
+          padding: 1rem;
           border: 2px dashed #9ca3af;
           border-radius: 10px;
           text-align: center;
@@ -201,11 +228,18 @@ export const ProductCreator = ({
 
         .file-label:hover {
           border-color: #2563eb;
-          background: #f3f4f6;
+          background: #f9fafb;
         }
 
         .file-input {
           display: none;
+        }
+
+        /* Input row (dos columnas) */
+        .input-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
         }
 
         /* Error */
