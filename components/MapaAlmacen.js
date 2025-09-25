@@ -5,8 +5,25 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
 
   // 🔹 Ubicaciones con piso incluido
   const ubicaciones = [
+      // Piso EG
+    { id: "10A-A01021",piso: -1, top: "0%", left: "0%" },
+    { id: "10A-A01031",piso: -1, top: "0%", left: "5.5%" },
+    { id: "10A-A01041",piso: -1, top: "0%", left: "11%" },
+    { id: "10A-A01051",piso: -1, top: "0%", left: "16.5%" },
+    { id: "10B-A01021",piso: -1, top: "0%", left: "22%" },
+    { id: "10B-A01031",piso: -1, top: "0%", left: "27.5%" },
+    { id: "10B-A01041",piso: -1, top: "0%", left: "33%" },
+        // Piso EG
+    { id: "10A-A01021",piso: 0, top: "0%", left: "0%" },
+    { id: "10A-A01031",piso: 0, top: "0%", left: "5.5%" },
+    { id: "10A-A01041",piso: 0, top: "0%", left: "11%" },
+    { id: "10A-A01051",piso: 0, top: "0%", left: "16.5%" },
+    { id: "10B-A01021",piso: 0, top: "0%", left: "22%" },
+    { id: "10B-A01031",piso: 0, top: "0%", left: "27.5%" },
+    { id: "10B-A01041",piso: 0, top: "0%", left: "33%" },
+
     // Piso 1
-   { id: " 10A-A01021", piso: 1, top: "0%", left: "0%" },
+    { id: "10A-A01021",piso: 1, top: "0%", left: "0%" },
     { id: "10A-A01031",piso: 1, top: "0%", left: "5.5%" },
     { id: "10A-A01041",piso: 1, top: "0%", left: "11%" },
     { id: "10A-A01051",piso: 1, top: "0%", left: "16.5%" },
@@ -63,14 +80,11 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
     { id: "30B-A02031",piso: 1, top: "15%", right: "27.5%" },
     { id: "30B-A02041",piso: 1, top: "15%", right: "33%" },
 
-    // Piso 2
-    { id: "10B-A01021", piso: 2, top: "0%", left: "0%" },
-    { id: "10B-A01031", piso: 2, top: "0%", left: "5.5%" },
-    { id: "10D-B04021", piso: 2, top: "0%", left: "11%" },
-
     // Piso 3
     { id: "20B-A01021", piso: 3, top: "0%", right: "0%" },
     { id: "20A-A01021", piso: 3, top: "0%", right: "5.5%" },
+    { id: "20A-A01021", piso: 3, top: "0%", right: "5.5%" },
+    { id: "20C-A01041", piso: 3, top: "0%", right: "11%" },
     { id: "20C-A01041", piso: 3, top: "0%", right: "11%" },
   ];
 
@@ -84,6 +98,7 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
     }
   }, [ubicacionActiva]);
 
+
   return (
     <div className="mapa-container">
       <div className="selector-pisos">
@@ -93,7 +108,7 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
             className={pisoActivo === p ? "activo" : ""}
             onClick={() => setPisoActivo(p)}
           >
-            Piso {p}
+            Stock {p}
           </button>
         ))}
       </div>
@@ -171,8 +186,7 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid #888;
-          background: linear-gradient(145deg, #f5f5f5, #ddd);
+          border: 1px solid #999999ff;
           font-weight: 500;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -187,13 +201,14 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
         }
 
         .estante:hover {
-          background: #b3ffb3;
-          transform: scale(1.05);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
+  background: #c8f7c5;
+  transform: scale(1.02);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
 
         .activo {
-          background: #4caf50 !important;
+          background: #36d43bff !important;
           color: white;
           font-weight: bold;
           box-shadow: 0 0 15px #4caf50;

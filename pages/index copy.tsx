@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useProduct } from '../services/useProducts';
 import MapaAlmacen from '../components/MapaAlmacen';
+import { AnimatedText, AnimatedWords, AnimatedPhrases } from "../components/animations"
 
 export default function Home() {
   const { products, loading, error } = useProduct();
@@ -12,6 +13,13 @@ export default function Home() {
   const [ubicacionActiva, setUbicacionActiva] = useState(null);
   const [modalUbicacionAbierto, setModalUbicacionAbierto] = useState(false);
   const [articulosUbicacion, setArticulosUbicacion] = useState([]);
+
+  const phrases = [
+ "Artikel",
+ "Artikel suchen",
+ "Busca tu articulo",
+ "Search"
+  ];
 
   const handleBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
@@ -52,7 +60,13 @@ export default function Home() {
     <>
       <div className="container">
         <div className="card">
-          <h2>Artikel </h2>
+          {/* <h2>Artikel </h2> */}
+           <AnimatedPhrases
+          phrases={phrases}
+          animationType="zoom"
+          duration={1.2}
+          interval={5}
+        />
           <input
             type="text"
             placeholder="N° Articulo o artikelName"
@@ -120,12 +134,12 @@ export default function Home() {
         <div className="modal-overlay" onClick={() => setModalUbicacionAbierto(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <button className="cerrar" onClick={() => setModalUbicacionAbierto(false)}>×</button>
-            <h3 className='hModal'>Artículos en {ubicacionActiva}</h3>
+            <h3 className='hModal'>Lagerplatz {ubicacionActiva}</h3>
             {articulosUbicacion.length > 0 ? (
               <ul>
                 {articulosUbicacion.map((a, i) => (
-                  <li key={i}>
-                    <strong>{a.artikelNumber}</strong> - {a.artikelName}
+                  <li  key={i}>
+                    <strong >{a.artikelNumber}</strong> - {a.artikelName}
                   </li>
                 ))}
               </ul>
@@ -136,96 +150,162 @@ export default function Home() {
         </div>
       )}
 
-      <style jsx>{`
-        .product-image {
-          border-radius: 5px;
-          width: 100%;
-          max-width: 300px;
-          margin: 1rem auto;
-          display: block;
-          border: 1px solid #ccc;
-          object-fit: cover;
-        }
-        .item {
-          padding: 16px;
-          margin-bottom: 5px;
-          transition: background 0.3s ease;
-        }
-        .item:hover {
-          background-color: rgba(255, 255, 255, 1);
-          transform: scale(1.02);
-        }
-        h2 {
-          margin: 0 0 15px 0;
-        }
-        p {
-          display: inline;
-          font-size: 20px;
-          margin: 0 5px 0 0;
-        }
-        .container {
-          display: flex;
-          justify-content: center;
-          margin-top: 1rem;
-        }
-        .card {
-          border-radius: 5px;
-          background-color: rgba(245, 245, 245, 1);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          padding: 30px;
-          width: 800px;
-          text-align: center;
-        }
-        input {
-          font-family: inherit;
-          font-size: 20px;
-          padding: 17px;
-          width: 100%;
-          margin-bottom: 10px;
-          border: 2px solid rgba(178, 223, 255, 1);
-          transition: 0.3s;
-          border-radius: 10px;
-        }
-        input:hover {
-          border: 2px solid rgba(0, 0, 0, 1);
-        }
-        .lista-resultados {
-          text-align: left;
-        }
-        .modal-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 999;
-        }
-        .modal {
-          background: rgba(255, 255, 255, 1);
-          border: 1px solid rgba(189, 189, 189, 0.06);
-          box-shadow: 10px 10px 25.4px 0.5px rgba(0, 0, 0, 0.35),
-                      -5px -6px 25.4px 5px rgba(0, 0, 0, 0.25);
-          padding: 30px;
-          margin: 6rem 2rem auto;
-          width: 700px;
-          position: relative;
-          color: black;
-          text-align: center;
-          border-radius: 2px;
-          max-height: 80vh; 
-          overflow-y: auto;
-        }
-        .modal .cerrar {
-          position: absolute;
-          top: 10px;
-          right: 15px;
-          background: transparent;
-          border: none;
-          font-size: 35px;
-          color: black;
-          cursor: pointer;
-        }
-      `}</style>
+     <style jsx>{`
+  .product-image {
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem auto;
+    display: block;
+    border: 1px solid #ccc;
+    object-fit: cover;
+  }
+  .item {
+    padding: 16px;
+    margin-bottom: 5px;
+    transition: background 0.3s ease;
+  }
+  .item:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: scale(1.02);
+  }
+  h2 {
+    margin: 0 0 15px 0;
+  }
+  p {
+    display: inline;
+    font-size: 20px;
+    margin: 0 5px 0 0;
+  }
+  .container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    padding: 0 10px;
+  }
+  .card {
+    border-radius: 5px;
+    background-color: rgba(245, 245, 245, 1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+  }
+  input {
+    font-family: inherit;
+    font-size: 20px;
+    padding: 17px;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 2px solid rgba(178, 223, 255, 1);
+    transition: 0.3s;
+    border-radius: 10px;
+  }
+  input:hover {
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+  .lista-resultados {
+    text-align: left;
+  }
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 10px;
+    background: rgba(0,0,0,0.4);
+  }
+  .modal {
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(189, 189, 189, 0.06);
+    box-shadow: 10px 10px 25.4px 0.5px rgba(0, 0, 0, 0.35),
+                -5px -6px 25.4px 5px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    margin: auto;
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+    color: black;
+    text-align: center;
+    border-radius: 10px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal .cerrar {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 35px;
+    color: black;
+    cursor: pointer;
+  }
+
+  /* ===== Estilos responsivos ===== */
+  @media (max-width: 768px) {
+    p {
+      font-size: 16px;
+    }
+    input {
+      font-size: 16px;
+      padding: 12px;
+    }
+    .card {
+      padding: 20px;
+    }
+    .item {
+      padding: 12px;
+    }
+    h2 {
+      font-size: 22px;
+    }
+  }
+@media (max-width: 480px) {
+   .product-image {
+    width: 90%;
+    max-width: 160px;
+    margin: 1rem auto;
+    display: block;
+    border: 1px solid #8181813d;
+    object-fit: cover;
+  }
+  .modal {
+    padding: 15px;
+    width: 95%;
+    height: 5950vh;
+    border-radius: 1px;
+  }
+
+  .modal h2 {
+    font-size: 1rem;
+  }
+ul {
+    list-style: none;    /* Quita los puntos o números */
+  margin: 0;           /* Quita el margen externo */
+  padding: 0; 
+
+}
+  .modal ul li {
+     list-style: none;
+    margin: 0;
+    padding: 0;
+    padding: 4px;
+    font-size:0.8rem;
+  }
+
+  .modal ul li p { margin: 0;
+    font-size: 0.75rem;
+  }
+
+  .modal ul li input {
+    font-size: 0.75rem;
+  }
+}
+`}</style>
     </>
   );
 }

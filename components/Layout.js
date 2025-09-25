@@ -4,7 +4,7 @@ const Layout = ({ children}) => {
     return (
 
 <>
-                <Cabezera />   
+                 <Cabezera /> 
         <div className="content">    
              { children }
         </div>
@@ -19,6 +19,7 @@ const Layout = ({ children}) => {
 		font-size: 20px;
 		line-height: 1.6;
 	} 
+  
   `}</style>
     
 </>

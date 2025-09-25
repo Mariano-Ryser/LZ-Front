@@ -10,6 +10,7 @@ const Cabezera = () => {
     { href: "/about", text: "Info" },
     { href: "/products", text: "Artikel" },
     { href: "/mapa", text: "Map" },
+    // { href: "/caffe", text: "caffe" },
     { href: "/adminDash", text: "Admin" },
   ];
 

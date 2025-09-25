@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useProduct } from '../services/useProducts';
 import MapaAlmacen from '../components/MapaAlmacen';
+import { AnimatedText, AnimatedWords, AnimatedPhrases } from "../components/animations"
 
 export default function Home() {
   const { products, loading, error } = useProduct();
@@ -13,6 +14,13 @@ export default function Home() {
   const [modalUbicacionAbierto, setModalUbicacionAbierto] = useState(false); // Modal para mostrar artículos en una ubicación específica
 
   const [articulosUbicacion, setArticulosUbicacion] = useState([]); // Artículos en la ubicación seleccionada
+
+  const phrases = [
+ "Artikel",
+ "Artikel suchen",
+ "Busca tu articulo",
+ "Search"
+  ];
 
   const handleBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
@@ -53,7 +61,13 @@ export default function Home() {
     <>
       <div className="container">
         <div className="card">
-          <h2>Artikel </h2>
+          {/* <h2>Artikel </h2> */}
+           <AnimatedPhrases
+          phrases={phrases}
+          animationType="zoom"
+          duration={1.2}
+          interval={5}
+        />
           <input
             type="text"
             placeholder="N° Articulo o artikelName"
@@ -121,7 +135,7 @@ export default function Home() {
         <div className="modal-overlay" onClick={() => setModalUbicacionAbierto(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <button className="cerrar" onClick={() => setModalUbicacionAbierto(false)}>×</button>
-            <h3 className='hModal'>Artículos en {ubicacionActiva}</h3>
+            <h3 className='hModal'>Lagerplatz {ubicacionActiva}</h3>
             {articulosUbicacion.length > 0 ? (
               <ul>
                 {articulosUbicacion.map((a, i) => (
@@ -278,8 +292,8 @@ ul {
 }
   .modal ul li {
      list-style: none;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
     padding: 4px;
     font-size:0.8rem;
   }
