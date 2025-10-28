@@ -1,6 +1,6 @@
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { useState, useContext } from "react";
-import { AuthContext } from "../../components/auth/AuthProvider";
+import { AuthContext } from "../../components/auth/AuthProvider"
 
 export default function DashboardHome() {
   const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
