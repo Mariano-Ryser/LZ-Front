@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProduct } from '../services/useProducts';
+import { useProduct } from '../hooks/useProducts';
 import MapaAlmacen from '../components/MapaAlmacen';
 import { AnimatedText, AnimatedWords, AnimatedPhrases } from "../components/animations"
 

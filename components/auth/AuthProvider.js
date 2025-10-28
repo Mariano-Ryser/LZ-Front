@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       credentials: 'include',
     });
     setIsAuthenticated(false);
-    // router.push('/adminDash');
+    router.push('/adminDash');
   };
 
   return (

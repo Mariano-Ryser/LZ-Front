@@ -2,15 +2,13 @@ import Cabezera from "./header/Cabezera"
 
 const Layout = ({ children}) => {
     return (
-
 <>
-                 <Cabezera /> 
+      <Cabezera /> 
         <div className="content">    
              { children }
         </div>
-        
-        <style jsx>{`
-        
+  
+<style jsx>{`    
   .content {
     margin: auto ;
 		width: 100%;
@@ -19,9 +17,7 @@ const Layout = ({ children}) => {
 		font-size: 20px;
 		line-height: 1.6;
 	} 
-  
   `}</style>
-    
 </>
     );
 }

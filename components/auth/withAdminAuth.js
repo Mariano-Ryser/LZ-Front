@@ -20,22 +20,3 @@ export default function withAuth(WrappedComponent) {
   };
 }
 
-
-
-
-
-
-// export default function withAuth(WrappedComponent) {
-//   return function ProtectedRoute(props) {
-//     const { isAuthenticated } = useContext(AuthContext);
-//     const router = useRouter();
-
-//     useEffect(() => {
-//       if (!isAuthenticated) {
-//         router.push('/adminDash');
-//       }
-//     }, [isAuthenticated]);
-
-//     return isAuthenticated ? <WrappedComponent {...props} /> : null;
-//   };
-// }

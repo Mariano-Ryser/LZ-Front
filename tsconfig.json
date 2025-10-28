@@ -30,7 +30,7 @@
   "pages/comentarBox/index.js",
    "components/Footer.js",
     "components/Cabezera.js",
-    "components/Layout.js", "components/NavRespon.jsx", "components/navigation/NavRespon.tsx", "components/cubo3D/test3.js", "pages/testColor.js", "pages/proyectos/apiMeteoro/cienciados.js", "next.config.js", "pages/proyectos/icons.js", "pages/index.tsx"  ],
+    "components/Layout.js", "components/NavRespon.jsx", "components/navigation/NavRespon.tsx", "components/cubo3D/test3.js", "pages/testColor.js", "pages/proyectos/apiMeteoro/cienciados.js", "next.config.js", "pages/proyectos/icons.js", "pages/index.tsx", "../../NeueNinjaLager/pages/adminDash/index copy.tsx"  ],
   "exclude": [
     "node_modules"
   ]

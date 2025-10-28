@@ -17,12 +17,7 @@ useEffect(() => {
 
   return (
     <>
-    {showSplash && (
-  <div className="splash-screen">
-    {/* Acá le podés poner una imagen si querés */}
-   <img src="/img/stern.png" alt="Logo" className="splash-image"/>
-  </div>
-)}
+    
      <Head>
       <title>LZ-Ninja</title>
       <meta charSet="UTF-8"></meta>
@@ -39,62 +34,9 @@ useEffect(() => {
         </Layout>
       </AuthProvider>
       <style jsx>{`
-.splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(178, 223, 255, 1);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: slideOut 0.5s ease-out forwards;
-  animation-delay: 1.2s;
-}
-
-.splash-image {
-  max-width: 250px;
-  max-height: 250px;
-  object-fit: contain;
-    animation: spin 5s linear infinite;
-        }
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-@keyframes slideOut {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
 
 
           @media (max-width: 768px) {
-            .splash-image {
-            max-width: 250px;
-            max-height: 250px;
-            object-fit: contain;
-              animation: spin 2s linear infinite;
-        }
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
       
   }
 

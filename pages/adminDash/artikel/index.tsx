@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useContext } from 'react';
-import { AuthContext } from '../../components/auth/AuthProvider';
-import { useProduct } from '../../hooks/useProducts';
-import { ProductCreator } from './productCreator';
-import { ProductEditor } from './productEditor';
-import Loader from '../../utils/loader'
+import { AuthContext } from '../../../components/auth/AuthProvider';
+import { useProduct } from '../../../hooks/useProducts';
+import DashboardLayout from '../../../components/dashboard/DashboardLayout';
+import Loader from '../../../utils/loader'
+import { ProductCreator } from './components/productCreator';
+import { ProductEditor } from './components/productEditor';
 
 export function ListProduct() {
   const {
@@ -14,9 +15,9 @@ export function ListProduct() {
     updateProduct,
     handleChange,
     createProduct,
+    deleteProductImage,
     deleteProduct,
     setProductToEdit,
-    deleteProductImage
   } = useProduct();
 
   const { isAuthenticated } = useContext(AuthContext);
@@ -57,6 +58,7 @@ export function ListProduct() {
   }, [visibleCount, filteredProducts.length]);
 
   return (
+    <DashboardLayout>
     <div className="container">
       {isAuthenticated && (
         <button onClick={() => setShowModal(true)} className="new-product-button">
@@ -126,8 +128,7 @@ export function ListProduct() {
           {loadingMore ? <Loader></Loader> : 'Baja para ver más'}
         </div>
       )}
-
-      {editingProduct && (
+            {editingProduct && (
         <ProductEditor
 
           product={editingProduct}
@@ -161,7 +162,7 @@ export function ListProduct() {
           onClose={() => setShowModal(false)}
         />
       )}
-
+    
      <style jsx>{`
   .container {
     padding: 1rem;
@@ -220,7 +221,7 @@ export function ListProduct() {
   /* === GRID PRODUCTOS === */
   .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
   }
 
@@ -292,11 +293,6 @@ export function ListProduct() {
       flex-direction: column;
       align-items: stretch;
     }
-     .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-  }
 
     .search-input {
       width: 100%;
@@ -309,6 +305,7 @@ export function ListProduct() {
   }
 `}</style>
     </div>
+    </DashboardLayout>
   );
 }
 

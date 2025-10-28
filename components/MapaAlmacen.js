@@ -157,7 +157,7 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
         }
 
         .selector-pisos button.activo {
-          background: #4caf50;
+          background: #707070ff;
           color: white;
           font-weight: bold;
         }
@@ -201,17 +201,16 @@ export default function MapaAlmacen({ ubicacionActiva, setUbicacionActiva, onSel
         }
 
         .estante:hover {
-  background: #c8f7c5;
+  background: #858585ff;
   transform: scale(1.02);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
   z-index: 2;
 }
 
         .activo {
-          background: #36d43bff !important;
-          color: white;
+          background: #25d631ff !important;
+          color: black !important;
           font-weight: bold;
-          box-shadow: 0 0 15px #4caf50;
         }
 
         @media (max-width: 600px) {

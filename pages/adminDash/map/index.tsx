@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useProduct } from '../../hooks/useProducts';
-import Map from '../../components/MapaAlmacen';
+import { useProduct } from '../../../hooks/useProducts';
+import DashboardLayout from "../../../components/dashboard/DashboardLayout";
+import Map from '../../../components/MapaAlmacen';
 
 export function Mapa() {
   const { products, loading, error } = useProduct();
@@ -16,8 +17,11 @@ export function Mapa() {
   };
 
   return (
+   <DashboardLayout>
     <div>
+
       {loading && <p>Cargando artículos...</p>}
+      
       {error && <p>Error al cargar productos.</p>}
       <Map
         ubicacionActiva={ubicacionActiva}
@@ -44,10 +48,11 @@ export function Mapa() {
             ) : (
               <p>No hay artículos en esta ubicación.</p>
             )}
-          </div>
-        </div>
-      )}
-
+            </div>
+            </div>
+          )}
+         
+      
       <style jsx>{`
         .modal-overlay {
           position: fixed;
@@ -76,9 +81,10 @@ export function Mapa() {
           font-size: 24px;
           cursor: pointer;
         }
-      `}</style>
-    </div>
-  );
-}
+        `}</style>
+        </div>
+       </DashboardLayout>
+    );
+  }
 
 export default Mapa;

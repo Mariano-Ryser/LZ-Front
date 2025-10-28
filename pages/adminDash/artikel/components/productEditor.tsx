@@ -1,8 +1,6 @@
 // components/products/productEditor.js
 import { useState , useContext, useEffect} from 'react';
-import { AuthContext } from '../../components/auth/AuthProvider';
-import MapaAlmacen from '../../components/MapaAlmacen';
-
+import { AuthContext } from '../../../../components/auth/AuthProvider';
 export const ProductEditor = ({ 
   product, 
   handleChange, 
