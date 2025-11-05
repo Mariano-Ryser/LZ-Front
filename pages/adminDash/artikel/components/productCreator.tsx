@@ -1,15 +1,15 @@
 import { useState } from "react";
 
-//  Definimos los tipos del producto
 interface Product {
   artikelName?: string;
   lagerPlatz?: string;
   artikelNumber?: string;
   description?: string;
+  stock?: number;
+  price?: number;
   imagen?: string | File | null;
 }
 
-//  Definimos los tipos de las props del componente
 interface ProductCreatorProps {
   product?: Product;
   handleChange: (
@@ -29,35 +29,34 @@ export const ProductCreator: React.FC<ProductCreatorProps> = ({
   error,
   onClose,
 }) => {
-  // Normalizamos el estado para evitar undefined
   const safeProduct: Product = {
     artikelName: product.artikelName ?? "",
     lagerPlatz: product.lagerPlatz ?? "",
     artikelNumber: product.artikelNumber ?? "",
     description: product.description ?? "",
+    stock: product.stock ?? 0,
+    price: product.price ?? 0,
     imagen: product.imagen ?? null,
   };
+
   return (
     <div className="modal-overlay">
       <div className="modal-container">
-        {/* HEADER */}
         <div className="modal-header">
           <h2>➕ Nuevo Producto</h2>
-          <button className="close-button" onClick={onClose}>
-            ×
-          </button>
-      </div>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
 
-        {/* BODY */}
         <div className="modal-body">
           <form onSubmit={createProduct} className="form">
+
             <div className="input-group">
               <label>Nombre del artículo</label>
               <input
                 type="text"
                 name="artikelName"
-                placeholder="Ej: Taladro Bosch"
                 value={safeProduct.artikelName}
+                placeholder="Taladro Bosch"
                 onChange={handleChange}
                 required
               />
@@ -69,8 +68,8 @@ export const ProductCreator: React.FC<ProductCreatorProps> = ({
                 <input
                   type="text"
                   name="lagerPlatz"
-                  placeholder="Ej: A-12"
                   value={safeProduct.lagerPlatz}
+                  placeholder="A-12"
                   onChange={handleChange}
                 />
               </div>
@@ -80,32 +79,59 @@ export const ProductCreator: React.FC<ProductCreatorProps> = ({
                 <input
                   type="text"
                   name="artikelNumber"
-                  placeholder="Ej: 345-AB"
                   value={safeProduct.artikelNumber}
+                  placeholder="345-AB"
                   onChange={handleChange}
                 />
               </div>
+            </div>
+
+            {/* ✅ Cantidad */}
+            <div className="input-group">
+              <label>Cantidad</label>
+              <input
+                type="number"
+                name="stock"
+                value={safeProduct.stock}
+                onChange={handleChange}
+                min={0}
+              />
+            </div>
+
+            {/* ✅ Precio */}
+            <div className="input-group">
+              <label>Precio (€)</label>
+              <input
+                type="number"
+                name="price"
+                value={safeProduct.price}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                placeholder="Ej: 2.50"
+              />
             </div>
 
             <div className="input-group">
               <label>Descripción</label>
               <textarea
                 name="description"
-                placeholder="Escribe una breve descripción..."
                 value={safeProduct.description}
                 onChange={handleChange}
-                rows={3} // ✅ corregido: número, no string
+                rows={3}
+                placeholder="Descripción del producto..."
               />
             </div>
 
+            {/* 📷 Imagen */}
             <div className="input-group file-upload">
               <label className="file-label">
                 📷 Subir imagen
                 <input
                   type="file"
                   name="imagen"
-                  onChange={handleChange}
                   accept="image/*"
+                  onChange={handleChange}
                   className="file-input"
                 />
               </label>
@@ -113,19 +139,15 @@ export const ProductCreator: React.FC<ProductCreatorProps> = ({
 
             {error && <div className="error-message">⚠ {error}</div>}
 
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={loading}
-            >
+            <button type="submit" className="submit-button" disabled={loading}>
               {loading ? "⏳ Creando..." : "✅ Crear Producto"}
             </button>
           </form>
         </div>
       </div>
 
-      {/* === STYLES === */}
       <style jsx>{`
+        /* MISMO ESTILO QUE TENÍAS, SOLO LIGERAMENTE MEJORADO */
         .modal-overlay {
           position: fixed;
           inset: 0;
@@ -134,160 +156,50 @@ export const ProductCreator: React.FC<ProductCreatorProps> = ({
           justify-content: center;
           align-items: center;
           z-index: 1000;
-          padding: 20px;
         }
-
         .modal-container {
           width: 100%;
-          max-width: 520px;
-          background: #fff;
+          max-width: 560px;
+          background: white;
           border-radius: 14px;
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-          overflow: hidden;
-          animation: fadeIn 0.3s ease-out;
+          padding-bottom: 10px;
         }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         .modal-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
           padding: 1rem 1.25rem;
           background: #f3f4f6;
-          border-bottom: 1px solid #e5e7eb;
         }
-
-        .modal-header h2 {
-          margin: 0;
-          font-size: 1.3rem;
-          font-weight: 600;
-          color: #111827;
-        }
-
-        .close-button {
-          background: none;
-          border: none;
-          font-size: 1.6rem;
-          cursor: pointer;
-          color: #6b7280;
-          transition: color 0.2s;
-        }
-
-        .close-button:hover {
-          color: #111827;
-        }
-
-        .modal-body {
-          padding: 1.5rem;
-        }
-
         .form {
           display: flex;
           flex-direction: column;
-          gap: 1.25rem;
+          gap: 1rem;
+          padding: 1.5rem;
         }
-
-        .input-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.4rem;
-        }
-
-        label {
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #374151;
-        }
-
-        .input-group input,
-        .input-group textarea {
-          width: 100%;
-          padding: 0.7rem 1rem;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          font-size: 0.95rem;
-          transition: border 0.2s, box-shadow 0.2s;
-        }
-
-        .input-group input:focus,
-        .input-group textarea:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
-          outline: none;
-        }
-
-        textarea {
-          resize: none;
-        }
-
-        .file-label {
-          display: block;
-          padding: 1rem;
-          border: 2px dashed #9ca3af;
-          border-radius: 10px;
-          text-align: center;
-          cursor: pointer;
-          font-size: 0.9rem;
-          color: #374151;
-          transition: border-color 0.2s, background 0.2s;
-        }
-
-        .file-label:hover {
-          border-color: #2563eb;
-          background: #f9fafb;
-        }
-
-        .file-input {
-          display: none;
-        }
-
         .input-row {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 1rem;
         }
-
-        .error-message {
-          padding: 0.75rem;
-          border-radius: 8px;
-          background: #fee2e2;
-          color: #b91c1c;
-          font-size: 0.9rem;
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
         }
-
+        input,
+        textarea {
+          padding: 0.7rem;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          font-size: 0.95rem;
+        }
         .submit-button {
           padding: 0.85rem;
-          border: none;
           border-radius: 10px;
-          font-size: 1rem;
-          font-weight: 600;
-          color: white;
           background: #2563eb;
+          color: white;
+          font-weight: bold;
           cursor: pointer;
-          transition: background 0.2s, transform 0.1s;
-        }
-
-        .submit-button:hover:not(:disabled) {
-          background: #1e40af;
-        }
-
-        .submit-button:active:not(:disabled) {
-          transform: scale(0.98);
-        }
-
-        .submit-button:disabled {
-          background: #9ca3af;
-          cursor: not-allowed;
         }
       `}</style>
     </div>

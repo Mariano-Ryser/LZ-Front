@@ -15,13 +15,12 @@ export const ProductEditor = ({
 }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
    
-
+// Acceder al contexto de autenticación
   const { isAuthenticated } = useContext(AuthContext);
    // Verifica si el producto es válido antes de asignar el estado inicial
     const [localProduct, setLocalProduct] = useState(() => ({
       ...product,
     })); 
-  
   
 
   const handleLocalChange = (e) => {
@@ -122,6 +121,7 @@ export const ProductEditor = ({
           </div>
 
 
+              {isAuthenticated && (
           <div className="input-group file-input-group">
             <label className="file-label">
               <span>Bild ändern</span>
@@ -134,8 +134,8 @@ export const ProductEditor = ({
               />
  
             </label>
-          <button
-        className="submit-button delete"
+               <button
+               className="submit-button delete"
         onClick={async () => {
           if (confirm("¿Seguro que quieres eliminar la imagen?")) {
             await deleteProductImage(localProduct._id);
@@ -143,21 +143,22 @@ export const ProductEditor = ({
           }
         }}
         disabled={loading}
-      >
+        >
         🗑️ DELETE BILDER
       </button>
             {localProduct.imagen && localProduct.imagen instanceof File && (
-  <div className="preview-container">
+              <div className="preview-container">
     <p >Vista previa de la imagen:</p>
     <img 
       src={URL.createObjectURL(localProduct.imagen)} 
       alt="Vista previa" 
       className="preview-image"
-    />
+      />
   </div>
   
 )}
           </div>
+    )}
 
           {error && (
             <div className="error-message">

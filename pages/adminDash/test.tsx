@@ -3,8 +3,8 @@ import DashboardLayout from "../../components/dashboard/DashboardLayout";
 export default function ProfilePage() {
   return (
     <DashboardLayout>
-      <h1>Perfil de Usuario</h1>
-      <p>Configuraciones y datos personales.</p>
+      <h1>Test</h1>
+      <p>Test numero 1</p>
     </DashboardLayout>
   );
 }

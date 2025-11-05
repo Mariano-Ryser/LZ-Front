@@ -4,7 +4,6 @@ import Layout from '../components/Layout'
 import { AuthProvider } from '../components/auth/AuthProvider';
 import { useState, useEffect, useContext  } from 'react';
 
-
 function MyApp({ Component, pageProps }) {
   const [showSplash, setShowSplash] = useState(true);
 useEffect(() => {
@@ -30,7 +29,6 @@ useEffect(() => {
        <AuthProvider>
         <Layout >
             <Component {...pageProps} />
-            
         </Layout>
       </AuthProvider>
       <style jsx>{`

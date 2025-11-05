@@ -2,20 +2,20 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import styles from "./DashboardLayout.module.css";
-import { useState, useContext } from "react";
-import { AuthContext } from "../../components/auth/AuthProvider";
+import { useState} from "react";
+import LogoutButton from "../ui/LogoutButton";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-const { isAuthenticated, login, logout } = useContext(AuthContext);
 
   const menuItems = [
     { path: "/adminDash", label: "Inicio" },
     { path: "/adminDash/artikel", label: "Artikel suche" },
+    { path: "/adminDash/clients", label: "Clients" },
     { path: "/adminDash/map", label: "Map" },
-    { path: "/adminDash/profile", label: "Perfil" },
-    { path: "/adminDash/settings", label: "Configuración" },
+    { path: "/adminDash/verkaufteArtikel", label: "Verkaufte Artikel" },
+    { path: "/adminDash/regnung", label: "Rechnungen" },
   ];
 
   return (
@@ -37,16 +37,7 @@ const { isAuthenticated, login, logout } = useContext(AuthContext);
               </li>
             ))}
 
-              {isAuthenticated && (
-                <button onClick={logout} className="logout-button">
-                  <span>Logout</span>
-                </button>
-              )}
-              {!isAuthenticated && (
-                <button onClick={login} className="login-button">
-                  <span>Login</span>
-                </button>
-              )}
+           <LogoutButton />
               
           </ul>
         </nav>

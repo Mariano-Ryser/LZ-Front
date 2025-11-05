@@ -45,7 +45,6 @@ export const ProductEditor = ({
       e.preventDefault();
       updateProduct(e, localProduct); 
   };
-  const [ubicacionActiva, setUbicacionActiva] = useState(null);
 
   return (
     <div className="modal-overlay">
@@ -119,7 +118,33 @@ export const ProductEditor = ({
             />
           </div>
 
+<div className="input-group">
+  <label>Cantidad</label>
+  <input
+    className="form-input"
+    type="number"
+    name="stock"
+    value={localProduct.stock ?? 0}
+    onChange={handleLocalChange}
+    min={0}
+  />
+</div>
 
+{/* ✅ Precio */}
+<div className="input-group">
+  <label>Precio (€)</label>
+  <input
+    className="form-input"
+    type="number"
+    name="price"
+    value={localProduct.price ?? 0}
+    onChange={handleLocalChange}
+    min="0"
+    step="0.01"
+    placeholder="Ej: 2.50"
+  />
+</div>
+           {isAuthenticated && (  
           <div className="input-group file-input-group">
             <label className="file-label">
               <span>Bild ändern</span>
@@ -129,10 +154,13 @@ export const ProductEditor = ({
                 onChange={handleLocalChange}
                 accept="image/*"
                 className="file-input"
-              />
+                />
  
             </label>
-          <button
+        
+        
+               
+        <button
         className="submit-button delete"
         onClick={async () => {
           if (confirm("¿Seguro que quieres eliminar la imagen?")) {
@@ -145,7 +173,7 @@ export const ProductEditor = ({
         🗑️ DELETE BILDER
       </button>
             {localProduct.imagen && localProduct.imagen instanceof File && (
-  <div className="preview-container">
+              <div className="preview-container">
     <p >Vista previa de la imagen:</p>
     <img 
       src={URL.createObjectURL(localProduct.imagen)} 
@@ -156,6 +184,7 @@ export const ProductEditor = ({
   
 )}
           </div>
+  )}
 
           {error && (
             <div className="error-message">

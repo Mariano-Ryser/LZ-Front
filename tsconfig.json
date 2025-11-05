@@ -1,4 +1,3 @@
-// Aqui Activamos TypeScript!!! Tenemos un problema en resolbeJsonModule
 {
   "compilerOptions": {
     "target": "es5",

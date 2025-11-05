@@ -30,7 +30,7 @@ export function ListProduct() {
   const loadMoreRef = useRef(null);
 
   const filteredProducts = products.filter((p) =>
-    `${p.artikelName} ${p.artikelNumber}`.toLowerCase().includes(searchTerm.toLowerCase())
+    `${p.artikelName} ${p.artikelNumber}${p.lagerPlatz}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);

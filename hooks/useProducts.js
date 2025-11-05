@@ -4,7 +4,7 @@ import {
   getProducts,
   createProductAPI,
   updateProductAPI,
-  deleteProductImageAPI, 
+  deleteProductImageAPI,
   deleteProductAPI,
 } from "../services/productService";
 
@@ -14,7 +14,7 @@ export const useProduct = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  //fetch que trae los productos desde la api
+  // fetch que trae los productos desde la api
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -32,17 +32,32 @@ export const useProduct = () => {
       setLoading(false);
     }
   }
-//  manejar cambios de los imputs
 
+  // ✅ Manejar cambios de los inputs (CORREGIDO)
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value, files, type } = e.target;
+
+    // Si es archivo (imagen)
     if (files) {
       setProduct((prev) => ({ ...prev, [name]: files[0] }));
-    } else {
-      setProduct((prev) => ({ ...prev, [name]: value }));
+      return;
     }
-  };
+
+    // ✅ Si es numero → convertir a number
+    if (type === "number") {
+      setProduct((prev) => ({
+        ...prev,
+        [name]: value === "" ? "" : Number(value),
+      }));
+      return;
+    }
+
+    // ✅ Strings normales
+    setProduct((prev) => ({ ...prev, [name]: value }));
   
+
+  };
+
   // Crear producto
   async function createProduct(e) {
     e.preventDefault();
@@ -52,6 +67,7 @@ export const useProduct = () => {
       setProducts((prev) => [...prev, created]);
       setProduct({});
       return { success: true };
+         
     } catch (err) {
       setError(err.message);
       return { success: false };
@@ -60,7 +76,7 @@ export const useProduct = () => {
     }
   }
 
-  // 🔄 Actualizar producto
+  // Actualizar producto
   async function updateProduct(e, updatedProduct) {
     e.preventDefault();
     setLoading(true);
@@ -74,28 +90,30 @@ export const useProduct = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+          fetchProducts();
     }
   }
 
-  // 🖼️ Eliminar solo la imagen del producto
-async function deleteProductImage(id) {
-  setLoading(true);
-  try {
-    const result = await deleteProductImageAPI(id);
-    // Actualizar el estado local del producto
-    setProducts((prev) =>
-      prev.map((p) =>
-        p._id === id ? { ...p, imagen: "", publicId: "" } : p
-      )
-    );
-    return result;
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
+  // Eliminar solo la imagen del producto
+  async function deleteProductImage(id) {
+    setLoading(true);
+    try {
+      const result = await deleteProductImageAPI(id);
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === id ? { ...p, imagen: "", publicId: "" } : p
+        )
+      );
+      return result;
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+          fetchProducts();
+    }
   }
-}
-  //  Eliminar producto
+
+  // Eliminar producto
   async function deleteProduct(id) {
     setLoading(true);
     try {
@@ -105,11 +123,13 @@ async function deleteProductImage(id) {
       setError(err.message);
     } finally {
       setLoading(false);
+          fetchProducts();
     }
   }
 
-  // ✨ Configurar producto a editar
+  // Configurar producto a editar
   const setProductToEdit = (p) => setProduct(p);
+
   return {
     product,
     products,
