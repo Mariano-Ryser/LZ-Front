@@ -3,6 +3,7 @@ import { useSales } from "../../../../hooks/useSales";
 import { useClients } from "../../../../hooks/useClients";
 import { useProduct } from "../../../../hooks/useProducts";
 
+
 export default function RechnungUpdate({ sale, onClose, onSaved }) {
   const { updateSale, loading } = useSales();
   const { clients } = useClients();

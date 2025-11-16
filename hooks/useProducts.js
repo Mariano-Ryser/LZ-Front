@@ -13,6 +13,7 @@ export const useProduct = () => {
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // ← NUEVO: trigger para reset
 
   // fetch que trae los productos desde la api
   useEffect(() => {
@@ -54,8 +55,6 @@ export const useProduct = () => {
 
     // ✅ Strings normales
     setProduct((prev) => ({ ...prev, [name]: value }));
-  
-
   };
 
   // Crear producto
@@ -66,8 +65,8 @@ export const useProduct = () => {
       const created = await createProductAPI(product);
       setProducts((prev) => [...prev, created]);
       setProduct({});
+      setRefreshTrigger(prev => prev + 1); // ← NUEVO: trigger refresh
       return { success: true };
-         
     } catch (err) {
       setError(err.message);
       return { success: false };
@@ -86,11 +85,11 @@ export const useProduct = () => {
         prev.map((p) => (p._id === updated._id ? updated : p))
       );
       setError(null);
+      setRefreshTrigger(prev => prev + 1); // ← NUEVO: trigger refresh
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-          fetchProducts();
     }
   }
 
@@ -104,12 +103,12 @@ export const useProduct = () => {
           p._id === id ? { ...p, imagen: "", publicId: "" } : p
         )
       );
+      setRefreshTrigger(prev => prev + 1); // ← NUEVO: trigger refresh
       return result;
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-          fetchProducts();
     }
   }
 
@@ -119,11 +118,11 @@ export const useProduct = () => {
     try {
       await deleteProductAPI(id);
       setProducts((prev) => prev.filter((p) => p._id !== id));
+      setRefreshTrigger(prev => prev + 1); // ← NUEVO: trigger refresh
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-          fetchProducts();
     }
   }
 
@@ -135,6 +134,7 @@ export const useProduct = () => {
     products,
     loading,
     error,
+    refreshTrigger, // ← NUEVO: exponer el trigger
     handleChange,
     fetchProducts,
     createProduct,

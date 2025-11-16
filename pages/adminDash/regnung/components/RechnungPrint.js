@@ -1,328 +1,545 @@
 import React, { useRef } from "react";
 
 export default function RechnungPrint({ sale, onClose }) {
-  // ✅ Seguridad total en SSR — evita undefined
   const safeSale = sale || {};
   const items = safeSale.items || [];
   const subtotal = safeSale.subtotal || 0;
   const total = safeSale.total || 0;
   const tax = safeSale.tax || 0;
+  const discount = safeSale.discount || 0;
 
-  const taxRate = subtotal > 0 ? tax / subtotal : 0.1;
+  const taxRate = subtotal > 0 ? tax / subtotal : 0.08;
 
   const printRef = useRef();
+
+  const companyInfo = {
+    name: "Meine Firma GmbH",
+    address: "Musterstraße 123, 8000 Zürich",
+    phone: "+41 44 123 4567",
+    email: "rechnung@firma.com",
+    uid: "CHE-123.456.789",
+    iban: "CH93 0076 2011 6238 5295 7",
+    bank: "Mustermann Bank AG"
+  };
+
+  const calculateLineTotals = (item) => {
+    const quantity = item?.quantity || 0;
+    const unitPrice = item?.unitPrice || 0;
+    const lineTotal = quantity * unitPrice;
+    const lineTax = lineTotal * taxRate;
+    return { lineTotal, lineTax };
+  };
 
   const handlePrint = () => {
     if (typeof window === "undefined") return;
 
+    const printContent = printRef.current.innerHTML;
+    
     const newWin = window.open("", "_blank");
     newWin.document.write(`
+      <!DOCTYPE html>
       <html>
         <head>
           <title>Rechnung ${safeSale.lieferschein || ""}</title>
+          <meta charset="UTF-8">
           <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+            
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              padding: 35px;
-              color: #333;
-              background: #fff;
+              font-family: 'Inter', sans-serif;
+              padding: 15px;
+              color: #1a1a1a;
+              background: #ffffff;
+              line-height: 1.3;
+              font-size: 12px;
             }
 
-            .invoice-box {
-              max-width: 900px;
-              margin: auto;
-              padding: 40px;
-              border: 1px solid #dcdcdc;
-              border-radius: 10px;
-              background: #fafafa;
+            .invoice-container {
+              max-width: 800px;
+              margin: 0 auto;
+              background: #ffffff;
             }
 
-            .logo {
-              text-align: center;
-              margin-bottom: 25px;
-            }
-
-            .logo img {
-              max-height: 80px;
-            }
-
-            h1 {
-              font-size: 32px;
-              font-weight: 600;
-              text-align: center;
-              color: #222;
-              margin-bottom: 25px;
-            }
-
-            .details {
+            /* Header Compacto */
+            .invoice-header {
               display: flex;
-              gap: 15px;
-              flex-wrap: wrap;
-              margin-bottom: 25px;
-            }
-
-            .details div {
-              padding: 10px 15px;
-              background: #f3f3f3;
-              border: 1px solid #dbdbdb;
-              border-radius: 6px;
-              font-size: 15px;
-            }
-
-            .header {
-              display: flex;
-              flex-wrap: wrap;
               justify-content: space-between;
-              gap: 25px;
-              padding: 22px;
-              margin-bottom: 28px;
-              background: #f7f7f7;
-              border: 1px solid #e5e5e5;
-              border-radius: 8px;
+              align-items: flex-start;
+              margin-bottom: 20px;
+              padding-bottom: 15px;
+              border-bottom: 1px solid #e5e5e5;
             }
 
-            .issuer, .client {
-              flex: 1;
-              min-width: 260px;
-            }
-
-            h3 {
-              margin-bottom: 10px;
-              font-size: 17px;
+            .company-info h1 {
+              font-size: 18px;
               font-weight: 600;
-              color: #333;
+              color: #000;
+              margin-bottom: 2px;
             }
 
-            p {
-              margin: 4px 0;
-              font-size: 15px;
-              color: #444;
+            .company-details {
+              font-size: 10px;
+              color: #666;
+              line-height: 1.2;
             }
 
-            table {
+            .invoice-meta {
+              text-align: right;
+            }
+
+            .invoice-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: #000;
+              margin-bottom: 4px;
+            }
+
+            .invoice-number {
+              font-size: 11px;
+              color: #666;
+            }
+
+            /* Secciones Compactas */
+            .details-section {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+              margin-bottom: 20px;
+            }
+
+            .client-info, .invoice-details {
+              padding: 12px;
+              background: #f9f9f9;
+              border-radius: 4px;
+              border-left: 2px solid #ddd;
+            }
+
+            .section-title {
+              font-size: 11px;
+              font-weight: 600;
+              color: #000;
+              margin-bottom: 8px;
+              text-transform: uppercase;
+            }
+
+            .info-grid {
+              display: grid;
+              gap: 4px;
+            }
+
+            .info-item {
+              display: flex;
+              justify-content: space-between;
+            }
+
+            .info-label {
+              font-weight: 500;
+              color: #666;
+              font-size: 10px;
+            }
+
+            .info-value {
+              font-weight: 400;
+              color: #000;
+              font-size: 10px;
+            }
+
+            /* Tabla Compacta */
+            .items-table {
               width: 100%;
               border-collapse: collapse;
-              margin-bottom: 30px;
-              font-size: 14.5px;
+              margin-bottom: 15px;
+              font-size: 10px;
               background: white;
             }
 
-            th {
-              background: #ececec;
-              padding: 12px;
-              border: 1px solid #d0d0d0;
+            .items-table th {
+              background: #f5f5f5;
+              color: #000;
+              padding: 8px 6px;
+              text-align: left;
               font-weight: 600;
-              color: #333;
+              border: 1px solid #ddd;
             }
 
-            td {
+            .items-table td {
+              padding: 6px;
+              border: 1px solid #ddd;
+              font-size: 10px;
+            }
+
+            .text-right {
+              text-align: right;
+            }
+
+            .text-center {
+              text-align: center;
+            }
+
+            /* Totals Compactos */
+            .totals-section {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+              margin-bottom: 15px;
+            }
+
+            .payment-info {
               padding: 12px;
-              border: 1px solid #dedede;
+              background: #f0f8ff;
+              border-radius: 4px;
+              border: 1px solid #d0e8ff;
             }
 
-            tr:nth-child(even) td {
-              background: #f7f7f7;
+            .payment-info h3 {
+              font-size: 11px;
+              color: #0066cc;
+              margin-bottom: 8px;
             }
 
-            .totals {
-              max-width: 320px;
-              margin-left: auto;
-              margin-top: 10px;
-              font-size: 15px;
-              border-top: 2px solid #000;
-              padding-top: 15px;
+            .totals-box {
+              padding: 12px;
+              background: #f9f9f9;
+              border-radius: 4px;
+              border: 1px solid #ddd;
             }
 
-            .totals div {
+            .total-row {
               display: flex;
               justify-content: space-between;
-              padding: 6px 0;
+              padding: 4px 0;
+              font-size: 10px;
             }
 
-            .total {
-              font-size: 18px;
-              font-weight: 700;
-              margin-top: 10px;
+            .total-row.final {
+              font-weight: 600;
+              border-top: 1px solid #000;
+              padding-top: 6px;
+              margin-top: 4px;
+              font-size: 11px;
             }
 
-            .footer {
-              margin-top: 40px;
+            /* Footer Compacto */
+            .invoice-footer {
+              margin-top: 15px;
+              padding-top: 12px;
+              border-top: 1px solid #ddd;
               text-align: center;
-              font-size: 13px;
               color: #666;
-              line-height: 1.5;
+              font-size: 9px;
             }
 
-            @media (max-width: 768px) {
-              .header {
-                flex-direction: column;
+            .footer-note {
+              background: #f5f5f5;
+              padding: 8px;
+              border-radius: 3px;
+              margin-top: 8px;
+              font-style: italic;
+            }
+
+            /* Utilidades */
+            .badge {
+              display: inline-block;
+              padding: 2px 6px;
+              background: #f0f0f0;
+              color: #666;
+              border-radius: 3px;
+              font-size: 9px;
+              font-weight: 500;
+            }
+
+            /* Print Optimizations */
+            @media print {
+              body {
+                padding: 10px;
+                margin: 0;
               }
-              .issuer, .client {
-                width: 100%;
+              
+              .invoice-container {
+                max-width: 100%;
               }
-              table, th, td {
-                font-size: 13px;
-                padding: 8px;
+              
+              .no-print {
+                display: none !important;
               }
-              .totals {
-                width: 100%;
+
+              @page {
+                margin: 0.5cm;
+              }
+            }
+
+            @media (max-width: 600px) {
+              .details-section,
+              .totals-section {
+                grid-template-columns: 1fr;
+                gap: 10px;
               }
             }
           </style>
         </head>
-        <body>${printRef.current.innerHTML}</body>
+        <body>
+          <div class="invoice-container">
+            ${printContent}
+          </div>
+        </body>
       </html>
     `);
     newWin.document.close();
-    newWin.focus();
-    newWin.print();
-    newWin.close();
+    
+    setTimeout(() => {
+      newWin.focus();
+      newWin.print();
+    }, 300);
   };
 
   return (
     <div className="modal-backdrop">
-      <div className="modal">
-        <button className="close-btn" onClick={onClose}>✖</button>
+      <div className="modal compact">
+        <button className="close-btn no-print" onClick={onClose}>✖</button>
 
-        <div ref={printRef} className="invoice-box">
-          <div className="logo">
-            <img src="../img/logo-lager.png" alt="Firmenlogo" />
-          </div>
-
-          <h1>Rechnung</h1>
-
-          <div className="details">
-            <div><strong>Lieferschein-Nr.:</strong> {safeSale.lieferschein || "-"}</div>
-            <div><strong>Datum:</strong> {safeSale.createdAt ? new Date(safeSale.createdAt).toLocaleDateString("de-DE") : "-"}</div>
-            <div><strong>Status:</strong> {safeSale.status || "-"}</div>
-          </div>
-
-          <div className="header">
-            <div className="issuer">
-              <h3>Aussteller:</h3>
-              <p>Meine Firma GmbH</p>
-              <p>Musterstraße 123, 8000 Zürich</p>
-              <p>UID: CHE-123.456.789</p>
-              <p>Tel: +41 44 123 4567</p>
-              <p>Email: kontakt@firma.com</p>
+        <div ref={printRef} className="print-content">
+          {/* Header Compacto */}
+          <div className="invoice-header">
+            <div className="company-info">
+              <h1>{companyInfo.name}</h1>
+              <div className="company-details">
+                <div>{companyInfo.address}</div>
+                <div>Tel: {companyInfo.phone} | Email: {companyInfo.email}</div>
+                <div>UID: {companyInfo.uid}</div>
+              </div>
             </div>
-
-            <div className="client">
-              <h3>Kunde:</h3>
-              <p>{safeSale.clientSnapshot?.name || "-"}</p>
-              {safeSale.clientSnapshot?.email && <p>Email: {safeSale.clientSnapshot.email}</p>}
-              {safeSale.clientSnapshot?.phone && <p>Tel: {safeSale.clientSnapshot.phone}</p>}
-              {safeSale.clientSnapshot?.address && <p>{safeSale.clientSnapshot.address}</p>}
+            
+            <div className="invoice-meta">
+              <div className="invoice-title">RECHNUNG</div>
+              <div className="invoice-number">Nr. {safeSale.lieferschein || "–"}</div>
+              <div style={{ marginTop: '4px' }}>
+                <span className={`badge ${safeSale.status || 'pending'}`}>
+                  {safeSale.status === 'paid' ? 'Bezahlt' : 
+                   safeSale.status === 'cancelled' ? 'Storniert' : 'Ausstehend'}
+                </span>
+              </div>
             </div>
           </div>
 
-          <table>
+          {/* Client & Details Compactos */}
+          <div className="details-section">
+            <div className="client-info">
+              <h3 className="section-title">Rechnungsempfänger</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <span className="info-label">Name:</span>
+                  <span className="info-value">{safeSale.clientSnapshot?.name || "–"}</span>
+                </div>
+                {safeSale.clientSnapshot?.email && (
+                  <div className="info-item">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{safeSale.clientSnapshot.email}</span>
+                  </div>
+                )}
+                {safeSale.clientSnapshot?.address && (
+                  <div className="info-item">
+                    <span className="info-label">Adresse:</span>
+                    <span className="info-value">{safeSale.clientSnapshot.address}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="invoice-details">
+              <h3 className="section-title">Rechnungsdetails</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <span className="info-label">Datum:</span>
+                  <span className="info-value">
+                    {safeSale.createdAt ? new Date(safeSale.createdAt).toLocaleDateString("de-DE") : "–"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Fällig:</span>
+                  <span className="info-value">
+                    {safeSale.createdAt ? 
+                      new Date(new Date(safeSale.createdAt).setDate(new Date(safeSale.createdAt).getDate() + 30))
+                        .toLocaleDateString("de-DE") : "–"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabla Compacta */}
+          <table className="items-table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Artikel</th>
-                <th>Menge</th>
-                <th>Einzelpreis (€)</th>
-                <th>MwSt (€)</th>
-                <th>Gesamt (€)</th>
+                <th style={{ width: '5%' }}>#</th>
+                <th style={{ width: '45%' }}>Beschreibung</th>
+                <th style={{ width: '10%' }} className="text-center">Menge</th>
+                <th style={{ width: '15%' }} className="text-right">Preis</th>
+                <th style={{ width: '15%' }} className="text-right">Gesamt</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item, idx) => {
-                const lineTax = (item?.lineTotal || 0) * taxRate;
+                const { lineTotal } = calculateLineTotals(item);
                 return (
                   <tr key={idx}>
                     <td>{idx + 1}</td>
-                    <td>{item?.artikelName || "-"}</td>
-                    <td>{item?.quantity || 0}</td>
-                    <td>{(item?.unitPrice || 0).toFixed(2)}</td>
-                    <td>{lineTax.toFixed(2)}</td>
-                    <td>{(item?.lineTotal || 0).toFixed(2)}</td>
+                    <td>
+                      <div>
+                        <strong>{item?.artikelName || "Artikel"}</strong>
+                        {item?.description && (
+                          <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                            {item.description}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="text-center">{item?.quantity || 0}</td>
+                    <td className="text-right">{(item?.unitPrice || 0).toFixed(2)} €</td>
+                    <td className="text-right">{lineTotal.toFixed(2)} €</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
 
-          <div className="totals">
-            <div><span>Zwischensumme:</span><span>{subtotal.toFixed(2)} €</span></div>
-            <div><span>MwSt ({(taxRate * 100).toFixed(0)}%):</span><span>{tax.toFixed(2)} €</span></div>
-            <div className="total"><span>Gesamt:</span><span>{total.toFixed(2)} €</span></div>
+          {/* Totals Compactos */}
+          <div className="totals-section">
+            <div className="payment-info">
+              <h3>Zahlungsinformation</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <span className="info-label">Bank:</span>
+                  <span className="info-value">{companyInfo.bank}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">IBAN:</span>
+                  <span className="info-value">{companyInfo.iban}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Zahlbar bis:</span>
+                  <span className="info-value">
+                    {safeSale.createdAt ? 
+                      new Date(new Date(safeSale.createdAt).setDate(new Date(safeSale.createdAt).getDate() + 30))
+                        .toLocaleDateString("de-DE") : "–"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="totals-box">
+              <div className="total-row">
+                <span>Zwischensumme:</span>
+                <span>{subtotal.toFixed(2)} €</span>
+              </div>
+              {discount > 0 && (
+                <div className="total-row">
+                  <span>Rabatt:</span>
+                  <span>-{discount.toFixed(2)} €</span>
+                </div>
+              )}
+              <div className="total-row">
+                <span>MWSt ({(taxRate * 100).toFixed(1)}%):</span>
+                <span>{tax.toFixed(2)} €</span>
+              </div>
+              <div className="total-row final">
+                <span>Gesamtbetrag:</span>
+                <span>{total.toFixed(2)} €</span>
+              </div>
+            </div>
           </div>
 
-          <div className="footer">
-            <p>Vielen Dank für Ihren Einkauf. Bitte begleichen Sie die Rechnung innerhalb von 30 Tagen.</p>
-            <p>Diese Rechnung wird elektronisch ausgestellt und benötigt keine Unterschrift.</p>
+          {/* Footer Compacto */}
+          <div className="invoice-footer">
+            <div className="footer-note">
+              <p>Vielen Dank für Ihren Auftrag! Bitte überweisen Sie den Betrag innerhalb von 30 Tagen.</p>
+              <p style={{ marginTop: '4px' }}>Diese Rechnung ist ohne Unterschrift gültig.</p>
+            </div>
           </div>
         </div>
 
-        <button className="print-btn" onClick={handlePrint}>Drucken</button>
+        <button className="print-btn no-print" onClick={handlePrint}>
+          🖨️ Drucken
+        </button>
       </div>
 
-      {/* ✅ CSS DEL COMPONENTE */}
+      {/* ✅ CSS COMPACTO */}
       <style jsx>{`
         .modal-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.55);
+          background: rgba(0,0,0,0.7);
           display: flex;
           justify-content: center;
           align-items: center;
           padding: 15px;
-          z-index: 1000;
+          z-index: 10000;
         }
 
-        .modal {
+        .modal.compact {
           background: #ffffff;
-          width: 900px;
-          max-width: 100%;
+          width: 850px;
+          max-width: 95vw;
           max-height: 95vh;
           overflow-y: auto;
-          padding: 35px 30px;
-          border-radius: 14px;
-          box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
           position: relative;
-          animation: fadeIn 0.25s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.96); }
-          to { opacity: 1; transform: scale(1); }
         }
 
         .close-btn {
           position: absolute;
-          top: 12px;
-          right: 12px;
-          background: #f1f1f1;
+          top: 10px;
+          right: 10px;
+          background: #666;
+          color: white;
           border: none;
-          font-size: 20px;
-          width: 34px;
-          height: 34px;
+          font-size: 14px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           cursor: pointer;
-          color: #555;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
         }
 
         .print-btn {
           display: block;
-          margin: 25px auto 0;
-          padding: 12px 30px;
-          background: #0d6efd;
+          margin: 20px auto 0;
+          padding: 10px 25px;
+          background: #333;
           color: white;
           border: none;
-          border-radius: 6px;
-          font-size: 16px;
-          cursor: pointer;
+          border-radius: 4px;
+          font-size: 14px;
           font-weight: 500;
+          cursor: pointer;
         }
 
-        @media (max-width: 600px) {
-          .modal {
-            padding: 25px 18px;
+        .print-btn:hover {
+          background: #555;
+        }
+
+        .no-print {
+          /* Oculto al imprimir */
+        }
+
+        @media (max-width: 768px) {
+          .modal.compact {
+            padding: 15px;
           }
+          
           .print-btn {
             width: 100%;
+            padding: 12px;
           }
         }
       `}</style>

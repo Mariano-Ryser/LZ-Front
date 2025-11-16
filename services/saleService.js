@@ -1,25 +1,56 @@
 const API = process.env.NEXT_PUBLIC_BACKEND_URL + '/sales';
 
 // -------------------------
-// Helper universal para errores
+// Helper universal para errores - MEJORADO
 // -------------------------
 async function handleResponse(res, defaultMessage) {
+  console.log('🌐 API Response:', {
+    status: res.status,
+    statusText: res.statusText,
+    url: res.url
+  });
+
   if (!res.ok) {
-    let err = null;
+    let errorMessage = defaultMessage;
     try {
-      err = await res.json();
-    } catch {}
-    throw new Error(err?.message || defaultMessage);
+      const errorData = await res.json();
+      errorMessage = errorData.message || errorData.error || defaultMessage;
+      console.error('❌ API Error details:', errorData);
+    } catch {
+      errorMessage = `HTTP ${res.status}: ${res.statusText}`;
+    }
+    throw new Error(errorMessage);
   }
-  return res.json();
+
+  const data = await res.json();
+  console.log('📄 API Response data:', data);
+  return data;
 }
 
 // -------------------------
-// GET all sales
+// GET all sales - CON TIMEOUT
 // -------------------------
 export async function getSales() {
-  const res = await fetch(API, { method: 'GET' });
-  return handleResponse(res, 'Error al obtener ventas');
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seg timeout
+
+  try {
+    const res = await fetch(API, { 
+      method: 'GET',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    clearTimeout(timeoutId);
+    return handleResponse(res, 'Error al obtener ventas');
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Timeout: El servidor tardó demasiado en responder');
+    }
+    throw error;
+  }
 }
 
 // -------------------------

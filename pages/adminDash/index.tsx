@@ -74,13 +74,11 @@ const handleLogin = async (e) => {
               />
               <span className="input-highlight"></span>
             </div>
-            
             <button type="submit" className="login-button">
               <span>Logger</span>
               <div className="button-border"></div>
             </button>
           </form>
-          
           {error && <p className="error-message">{error}</p>}
         </div>
 

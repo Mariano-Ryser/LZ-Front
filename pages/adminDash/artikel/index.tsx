@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AuthContext } from '../../../components/auth/AuthProvider';
 import { useProduct } from '../../../hooks/useProducts';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
-import Loader from '../../../utils/loader'
+import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
+import LoadMoreTrigger from '../../../components/shared/LoadMoreTrigger';
 import { ProductCreator } from './components/productCreator';
 import { ProductEditor } from './components/productEditor';
 
@@ -12,6 +13,7 @@ export function ListProduct() {
     products,
     loading,
     error,
+    refreshTrigger, // ← NUEVO: recibir el trigger
     updateProduct,
     handleChange,
     createProduct,
@@ -24,287 +26,530 @@ export function ListProduct() {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [visibleCount, setVisibleCount] = useState(40);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const loadMoreRef = useRef(null);
-
+  // Filtrar productos
   const filteredProducts = products.filter((p) =>
-    `${p.artikelName} ${p.artikelNumber}${p.lagerPlatz}`.toLowerCase().includes(searchTerm.toLowerCase())
+    `${p.artikelName} ${p.artikelNumber} ${p.lagerPlatz}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
-
-  // Infinite scroll con IntersectionObserver
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-    const observer = new IntersectionObserver( // callback
-      (entries) => { 
-        const [entry] = entries; 
-        if (entry.isIntersecting && visibleCount < filteredProducts.length) { 
-          setLoadingMore(true);
-          setTimeout(() => {
-            setVisibleCount((prev) => prev + 50);
-            setLoadingMore(false);
-          }, 500); // simula carga
-        }
-      },
-      { rootMargin: '200px' } // empieza a cargar un poco antes
-    );
-
-    observer.observe(loadMoreRef.current);
-
-    return () => observer.disconnect();
-  }, [visibleCount, filteredProducts.length]);
+  // Usar el hook de infinite scroll CON EL TRIGGER
+  const {
+    visibleItems: visibleProducts,
+    loadingMore,
+    loadMoreRef,
+    hasMore
+  } = useInfiniteScroll(filteredProducts, {
+    initialCount: 20,
+    loadMoreCount: 20,
+    loadDelay: 100, 
+  }, refreshTrigger); // ← NUEVO: pasar el trigger como dependencia
 
   return (
     <DashboardLayout>
-    <div className="container">
-      {isAuthenticated && (
-        <button onClick={() => setShowModal(true)} className="new-product-button">
-          + Nuevo Producto
-        </button>
-      )}
+      <div className="container">
+        <header className="header">
+          <div className="header-content">
+            <h1>Artikelliste</h1>
+            <p className="page-subtitle">Verwalten Sie Ihre Produktliste</p>
+          </div>
+          {isAuthenticated && (
+            <button onClick={() => setShowModal(true)} className="new-btn">
+              <span className="plus">+</span>
+              Neuer Artikel
+            </button>
+          )}
+        </header>
 
-      <div className="filters-container">
-        <input
-          type="text"
-          placeholder="Buscar por nombre o número"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
-      </div>
-
-
-   {/* GRID DE PRODUCTOS (MAPEADO) */}
-    <div className="product-grid">
-
-        {/* Si no hay productos que mostrar */}
-        {visibleProducts.length === 0 ? (
-          <p className="no-products">Artikel nicht gefunden</p>
-        ) : 
-        // Si hay productos que mostrar los mapeamos
-         (
-          visibleProducts.map((product) => (
-        // product card individual
-      <div
-            key={product._id}
-            className="product-card"
-            onClick={() => {
-            setEditingProduct(product);
-            setProductToEdit(product);
-            }}>
-
-          <div className="image-wrapper">
-            {/* imagen del producto si es que la tiene*/}
-            {product.imagen ? (
-              <img src={product.imagen} alt={product.artikelName} />
-            ) :
-            // si no tiene imagen mostramos placeholder
-            (
-              <div className="placeholder">  
-                <img
-                    src="/img/moving-box.png"
-                    alt="Logo"
-                    style={{ width: '8rem', height: '7rem', cursor: 'pointer' }}
-              /></div>
+        {/* Buscador */}
+        <div className="search-section">
+          <div className="search-container">
+            <svg className="search-icon" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Artikel suchen... (Name, Nummer, Lagerplatz)"
+              className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button 
+                className="clear-search"
+                onClick={() => setSearchTerm('')}
+              >
+                ✕
+              </button>
             )}
           </div>
-
-            {/* contenido del producto lagerplatz y nombre */}
-          <div className="product-content">
-            <h3 className="product-name">{product.artikelName}</h3>
-            <p className="lager">Lagerplatz: {product.lagerPlatz || '-'}</p>
+          <div className="search-stats">
+            <span className="results-count">
+              {visibleProducts.length} von {filteredProducts.length} Artikeln angezeigt
+              {hasMore && ` (${filteredProducts.length - visibleProducts.length} mehr verfügbar)`}
+            </span>
           </div>
-      </div>
-          ))
-        )}
-    </div>
-
-      {/* Sentinela para cargar más productos */}
-      {visibleCount < filteredProducts.length && (
-        <div ref={loadMoreRef} className="load-more-trigger">
-          {loadingMore ? <Loader></Loader> : 'Baja para ver más'}
         </div>
-      )}
-            {editingProduct && (
-        <ProductEditor
 
-          product={editingProduct}
-          handleChange={handleChange}
-          deleteProductImage={deleteProductImage}
-          updateProduct={(e, updatedProduct) => {
-            updateProduct(e, updatedProduct).then(() => {
-              if (!error) setEditingProduct(null);
-            });
-          }}
-          deleteProduct={deleteProduct}
-          loading={loading}
-          error={error}
-          onClose={() => setEditingProduct(null)}
-        />
-      )}
+        {/* Tabla tipo Excel */}
+        <div className="table-container">
+          {loading ? (
+            <div className="loading">
+              <div className="loading-spinner"></div>
+              Laden...
+            </div>
+          ) : visibleProducts.length === 0 ? (
+            <div className="empty-state">
+              {searchTerm ? (
+                <>
+                  <div className="empty-icon">🔍</div>
+                  <h3>Keine Artikel gefunden</h3>
+                  <p>Keine Ergebnisse für "{searchTerm}"</p>
+                  <button 
+                    className="clear-search-btn"
+                    onClick={() => setSearchTerm('')}
+                  >
+                    Suche zurücksetzen
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="empty-icon">📦</div>
+                  <h3>Keine Artikel vorhanden</h3>
+                  <p>Erstellen Sie Ihren ersten Artikel</p>
+                </>
+              )}
+            </div>
+          ) : (
+            <>
+              <table className="products-table">
+                <thead>
+                  <tr>
+                    <th className="col-name">Artikelname</th>
+                    <th className="col-lager">Lagerplatz</th>
+                    <th className="col-price">Preis (€)</th>
+                    <th className="col-stock">Bestand</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleProducts.map((product) => (
+                    <tr 
+                      key={product._id} 
+                      className="product-row"
+                      onClick={() => {
+                        setEditingProduct(product);
+                        setProductToEdit(product);
+                      }}
+                    >
+                      <td className="product-name">
+                        {product.artikelName}
+                      </td>
+                      <td className="product-lager">{product.lagerPlatz || '-'}</td>
+                      <td className="product-price">
+                        {product.price ? `€${parseFloat(product.price).toFixed(2)}` : '-'}
+                      </td>
+                      <td className="product-stock">
+                        <span className={`stock-badge ${(product.stock || 0) <= 0 ? 'out-of-stock' : (product.stock || 0) < 10 ? 'low-stock' : 'in-stock'}`}>
+                          {product.stock || 0}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-      {showModal && (
-        <ProductCreator
-          product={product}
-          handleChange={handleChange}
-          createProduct={async (e) => {
-            e.preventDefault();
-            const result = await createProduct(e);
-            if (result?.success) {
-              setShowModal(false);
-            }
-          }}
-          loading={loading}
-          error={error}
-          onClose={() => setShowModal(false)}
-        />
-      )}
-    
-     <style jsx>{`
-  .container {
-    padding: 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+              {/* Load More Trigger */}
+              <LoadMoreTrigger
+                loadingMore={loadingMore}
+                hasMore={hasMore}
+                loadMoreRef={loadMoreRef}
+                customMessage="Mehr Artikel laden"
+              />
+            </>
+          )}
+        </div>
 
-  /* === BOTÓN NUEVO PRODUCTO === */
-  .new-product-button {
-    margin-bottom: 1rem;
-    padding: 0.6rem 1.2rem;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
+        {editingProduct && (
+          <ProductEditor
+            product={editingProduct}
+            handleChange={handleChange}
+            deleteProductImage={deleteProductImage}
+            updateProduct={(e, updatedProduct) => {
+              updateProduct(e, updatedProduct).then(() => {
+                if (!error) setEditingProduct(null);
+              });
+            }}
+            deleteProduct={deleteProduct}
+            loading={loading}
+            error={error}
+            onClose={() => setEditingProduct(null)}
+          />
+        )}
 
-  .new-product-button:hover {
-    background: #0056b3;
-    transform: translateY(-2px);
-  }
+        {showModal && (
+          <ProductCreator
+            product={product}
+            handleChange={handleChange}
+            createProduct={async (e) => {
+              e.preventDefault();
+              const result = await createProduct(e);
+              if (result?.success) {
+                setShowModal(false);
+              }
+            }}
+            loading={loading}
+            error={error}
+            onClose={() => setShowModal(false)}
+          />
+        )}
+      </div>
 
-  .new-product-button:active {
-    transform: translateY(0);
-  }
-
-  /* === CONTENEDOR FILTROS (BUSCADOR) === */
-  .filters-container {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .search-input {
-    flex: 1;
-    padding: 0.6rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    min-width: 240px;
-    font-size: 1rem;
-    transition: border 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .search-input:focus {
-    outline: none;
-    border: 1px solid #007bff;
-    box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
-  }
-
-  /* === GRID PRODUCTOS === */
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-
-  .product-card {
-  border: 1px solid #ddd;
-  border-radius: 2px;
-  padding: 0.75rem;
-  background: white;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* empuja el lagerplatz al fondo */
-  height: 260px; /* altura fija para alineación */
-}
-.product-card:hover {
-  transform: translateY(-6px);              /* levanta un poco la tarjeta */
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12); /* sombra suave */
-  border-color: #007bff;                   /* resalta el borde */
-}
-.image-wrapper {
-  flex: 1; /* ocupa el espacio principal */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-  overflow: hidden;
-}
-
-.image-wrapper img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.product-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.product-name {
-  font-size: 0.95rem;
-  font-weight: 500;
-  margin: 0 0 0.5rem 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-  text-align: center;
-}
-
-.lager {
-  font-size: 0.8rem;
-  color: #666;
-  text-align: center;
-  margin-top: auto; /* se pega abajo */
-}
-  .load-more-trigger {
-    margin: 2rem 0;
-    text-align: center;
-    color: #555;
-  }
-
-  @media (max-width: 768px) {
-    .filters-container {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .search-input {
-      width: 100%;
-    }
-
-    .new-product-button {
-      width: 100%;
-      text-align: center;
-    }
-  }
-`}</style>
-    </div>
+      <style jsx>{`
+        .container {
+          padding: 20px;
+          min-height: 100vh;
+          background: #f8f9fa;
+        }
+        
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 30px;
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+        
+        .header-content {
+          flex: 1;
+        }
+        
+        h1 {
+          font-size: 2rem;
+          margin: 0 0 8px 0;
+          color: #333;
+          font-weight: 700;
+        }
+        
+        .page-subtitle {
+          color: #6c757d;
+          font-size: 1rem;
+          margin: 0;
+          font-weight: 400;
+        }
+        
+        .new-btn {
+          background: #4caf50;
+          color: white;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+          flex-shrink: 0;
+        }
+        
+        .new-btn:hover {
+          background: #45a049;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        .plus {
+          font-size: 1.2em;
+          font-weight: bold;
+        }
+        
+        /* Buscador */
+        .search-section {
+          margin-bottom: 24px;
+        }
+        
+        .search-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          max-width: 600px;
+          margin-bottom: 8px;
+        }
+        
+        .search-icon {
+          position: absolute;
+          left: 16px;
+          color: #6c757d;
+          pointer-events: none;
+          z-index: 2;
+        }
+        
+        .search-input {
+          width: 100%;
+          padding: 12px 16px 12px 48px;
+          border: 2px solid #e9ecef;
+          border-radius: 8px;
+          font-size: 0.95rem;
+          background: white;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-input:focus {
+          outline: none;
+          border-color: #4caf50;
+          box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .clear-search {
+          position: absolute;
+          right: 12px;
+          background: none;
+          border: none;
+          color: #6c757d;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          transition: all 0.2s ease;
+        }
+        
+        .clear-search:hover {
+          background: #f8f9fa;
+          color: #495057;
+        }
+        
+        .search-stats {
+          min-height: 20px;
+        }
+        
+        .results-count {
+          font-size: 0.85rem;
+          color: #6c757d;
+          font-weight: 500;
+        }
+        
+        /* Tabla Excel */
+        .table-container {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          overflow: hidden;
+        }
+        
+        .products-table {
+          width: 100%;
+          border-collapse: collapse;
+          background: white;
+        }
+        
+        .products-table th {
+          background: #f8f9fa;
+          padding: 1rem 1.25rem;
+          text-align: left;
+          font-weight: 600;
+          color: #495057;
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-bottom: 2px solid #e9ecef;
+          white-space: nowrap;
+        }
+        
+        .products-table td {
+          padding: 1rem 1.25rem;
+          border-bottom: 1px solid #e9ecef;
+          color: #495057;
+          font-size: 0.95rem;
+          vertical-align: middle;
+        }
+        
+        .product-row {
+          transition: background-color 0.15s ease;
+          cursor: pointer;
+        }
+        
+        .product-row:hover {
+          background-color: #f8f9fa;
+        }
+        
+        .product-row:last-child td {
+          border-bottom: none;
+        }
+        
+        /* Columnas específicas */
+        .col-name { width: 50%; }
+        .col-lager { width: 20%; }
+        .col-price { width: 15%; }
+        .col-stock { width: 15%; }
+        
+        .product-name {
+          font-weight: 500;
+          color: #333;
+        }
+        
+        .product-lager {
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+          color: #6c757d;
+        }
+        
+        .product-price {
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+          font-weight: 600;
+          color: #333;
+        }
+        
+        .stock-badge {
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          display: inline-block;
+          min-width: 40px;
+          text-align: center;
+        }
+        
+        .stock-badge.in-stock {
+          background: #d4edda;
+          color: #155724;
+        }
+        
+        .stock-badge.low-stock {
+          background: #fff3cd;
+          color: #856404;
+        }
+        
+        .stock-badge.out-of-stock {
+          background: #f8d7da;
+          color: #721c24;
+        }
+        
+        /* Estados de carga y vacío */
+        .loading {
+          padding: 60px 20px;
+          text-align: center;
+          color: #6c757d;
+          font-size: 1.1rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
+        
+        .loading-spinner {
+          width: 32px;
+          height: 32px;
+          border: 3px solid #f8f9fa;
+          border-top: 3px solid #4caf50;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+          padding: 80px 20px;
+          text-align: center;
+          color: #6c757d;
+        }
+        
+        .empty-icon {
+          font-size: 3rem;
+          margin-bottom: 1.5rem;
+          opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+          margin: 0 0 12px 0;
+          color: #495057;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+        
+        .empty-state p {
+          margin: 0 0 20px 0;
+          font-size: 0.95rem;
+          line-height: 1.5;
+        }
+        
+        .clear-search-btn {
+          background: #4caf50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+        
+        .clear-search-btn:hover {
+          background: #45a049;
+          transform: translateY(-1px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+          .container {
+            padding: 15px;
+          }
+          
+          .header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 20px;
+          }
+          
+          .header-content {
+            text-align: center;
+          }
+          
+          h1 {
+            font-size: 1.75rem;
+          }
+          
+          .search-container {
+            max-width: none;
+          }
+          
+          .table-container {
+            overflow-x: auto;
+          }
+          
+          .products-table {
+            min-width: 500px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .container {
+            padding: 10px;
+          }
+          
+          h1 {
+            font-size: 1.5rem;
+          }
+          
+          .page-subtitle {
+            font-size: 0.9rem;
+          }
+          
+          .search-input {
+            font-size: 0.9rem;
+            padding: 10px 14px 10px 42px;
+          }
+        }
+      `}</style>
     </DashboardLayout>
   );
 }

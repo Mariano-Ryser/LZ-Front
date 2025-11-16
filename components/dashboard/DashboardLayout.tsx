@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { useRouter } from "next/router";
 import styles from "./DashboardLayout.module.css";
@@ -8,7 +7,7 @@ import LogoutButton from "../ui/LogoutButton";
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const menuItems = [
     { path: "/adminDash", label: "Inicio" },
     { path: "/adminDash/artikel", label: "Artikel suche" },
@@ -36,11 +35,13 @@ export default function DashboardLayout({ children }) {
                 </Link>
               </li>
             ))}
-
-           <LogoutButton />
-              
           </ul>
         </nav>
+        
+        {/* Logout Button Container - Posicionado al fondo */}
+        <div className={styles.logoutContainer}>
+          <LogoutButton />
+        </div>
       </aside>
 
       {/* Contenido principal */}

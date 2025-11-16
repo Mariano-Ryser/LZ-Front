@@ -40,3 +40,80 @@ medida cel 380 x 700
 ° Mariano Ryser
 
 
+# {{}}
+
+/my-front
+├─ .next
+├─ node_modules
+├─ components
+│   ├─ auth
+│   │   ├─ AuthProvider.js
+│   │   └─ client.routes.js
+│   ├─ dashboard
+│   │   ├─ DashboardLayout.mocule.css
+│   │   └─ DashboardLayout.js
+│   ├─ header
+│   │   └─ Cabezera.js
+│   ├─ ui
+│   │   └─ LogoutButton.tsx
+│   ├─ Layout.js
+│   ├─ MapaAlmacen.js
+│   └─ Skeleton.js
+│
+├─ hooks
+│   └─ useProducts.js
+│       
+├─ pages
+│   ├─ adminDash
+│   │   ├─ artikel
+│   │   │    ├─ components
+│   │   │    │    ├─ productCreator.tsx
+│   │   │    │    └─ productEditor.tsx
+│   │   │    └─ index.tsx
+│   │   ├─ clients
+│   │   │    ├─ components
+│   │   │    │    └─ ClientCreator.js
+│   │   │    └─ index.tsx
+│   │   ├─ regnung
+│   │   │    ├─ components
+│   │   │    │    ├─ RechnungCreator.tsx
+│   │   │    │    ├─ RechnungPrint.tsx
+│   │   │    │    └─ RechnungUpdate.tsx
+│   │   │    └─ index.tsx
+│   │   ├─ verkauftteArtikel
+│   │   │    ├─ components
+│   │   │    │    └─ ArtikelList.js
+│   │   │    └─ index.tsx
+│   │   └─ index.tsx
+│   ├─ api
+│   ├─ login
+│   │   └─ index.tsx
+│   ├─ mapa
+│   │   └─ index.tsx
+│   ├─ register
+│   │   └─ index.tsx
+│   ├─ _app.js
+│   ├─ _document.js
+│   ├─ about.tsx
+│   └─ index.tsx
+│
+├─ public
+│
+├─ services
+│    └─ productService.tsx
+├─ styles
+│
+├─ utils
+│   ├─ formatters.js
+│   └─ loader.js
+├─ .env
+├─ .env-example
+├─ eslint.json
+├─ .gitignore
+├─ next-env.d.js
+├─ next.config.js
+├─ package-lock.json
+├─ package.json
+├─ README.md
+└─ styled-jsx.d.ts
+

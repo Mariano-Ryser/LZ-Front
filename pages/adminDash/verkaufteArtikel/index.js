@@ -10,21 +10,63 @@ export default function VerkauftetArtikelPage() {
   return (
     <DashboardLayout>
       <div className="container">
-        <h1 className="title">📦 Artículos Vendidos</h1>
+        <header className="header">
+          <div className="header-content">
+            <h1 className="page-title">Verkaufte Artikel</h1>
+            <p className="page-subtitle">Übersicht aller verkauften Artikel und Verkaufsstatistiken</p>
+          </div>
+        </header>
         <ArticleList products={products} sales={sales} />
       </div>
 
       <style jsx>{`
-        .container { 
-          padding: 20px; 
-          max-width: 1900px;
-          margin: 0 auto;
+        .container {
+          padding: 20px;
+          min-height: 100vh;
+          background: #f8f9fa;
         }
-        .title { 
-          font-size: 32px; 
-          text-align: center; 
-          margin-bottom: 25px; 
+
+        .header {
+          margin-bottom: 30px;
+        }
+
+        .page-title {
+          font-size: 2rem;
+          font-weight: 700;
           color: #333;
+          margin: 0 0 8px 0;
+          line-height: 1.2;
+        }
+
+        .page-subtitle {
+          color: #6c757d;
+          font-size: 1rem;
+          margin: 0;
+          font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+          .container {
+            padding: 15px;
+          }
+
+          .page-title {
+            font-size: 1.75rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .container {
+            padding: 10px;
+          }
+
+          .page-title {
+            font-size: 1.5rem;
+          }
+
+          .page-subtitle {
+            font-size: 0.9rem;
+          }
         }
       `}</style>
     </DashboardLayout>
