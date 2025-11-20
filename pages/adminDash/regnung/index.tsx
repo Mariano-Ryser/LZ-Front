@@ -8,7 +8,7 @@ import RechnungPrint from "./components/RechnungPrint";
 import RechnungUpdate from "./components/RechnungUpdate";
 
 export default function SalesPage() {
-  const { sales, loading, error, fetchSales } = useSales();
+  const { sales, loading, error, fetchSales, refreshSales } = useSales();
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -30,7 +30,6 @@ export default function SalesPage() {
     });
   }, [sales, search, dateFilter, statusFilter]);
 
-  // Configuración simple para infinite scroll
   const infiniteScrollConfig = {
     initialCount: 20,
     loadMoreCount: 20,
@@ -45,11 +44,11 @@ export default function SalesPage() {
     hasMore
   } = useInfiniteScroll(filtered, infiniteScrollConfig);
 
-  const formatCurrency = (amount : number) => {
+  const formatCurrency = (amount) => {
     return Number(amount || 0).toFixed(2);
   };
 
-  const getStatusColor = (status : string) => {
+  const getStatusColor = (status) => {
     const colors = {
       "paid": "#e1f7d4ff",
       "cancelled": "#ffe6e9", 
@@ -58,7 +57,7 @@ export default function SalesPage() {
     return colors[status] || "#f8f9fa";
   };
 
-  const getStatusText = (status : string) => {
+  const getStatusText = (status) => {
     const texts = {
       "paid": "Bezahlt",
       "cancelled": "Storniert",
@@ -67,7 +66,7 @@ export default function SalesPage() {
     return texts[status] || status;
   };
 
-  const formatDate = (dateString : string) => {
+  const formatDate = (dateString) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -76,8 +75,26 @@ export default function SalesPage() {
     });
   };
 
+  // 🔄 Función mejorada para refrescar
   const handleRefresh = async () => {
-    await fetchSales();
+    await refreshSales(); // Usar la nueva función del hook
+  };
+
+  // 🎯 Función para cerrar modales y refrescar
+  const handleCreateSuccess = () => {
+    setOpenModal(false);
+    handleRefresh();
+  };
+
+  const handleUpdateSuccess = () => {
+    setUpdateModalOpen(false);
+    setSaleToEdit(null);
+    handleRefresh();
+  };
+
+  const handleUpdateClose = () => {
+    setUpdateModalOpen(false);
+    setSaleToEdit(null);
   };
 
   return (
@@ -97,7 +114,7 @@ export default function SalesPage() {
             {error && (
               <div className="error-message">
                 ❌ Fehler: {error}
-                <button onClick={fetchSales} className="retry-button">
+                <button onClick={handleRefresh} className="retry-button">
                   Erneut versuchen
                 </button>
               </div>
@@ -185,7 +202,7 @@ export default function SalesPage() {
             <div className="error-icon">⚠️</div>
             <h3>Fehler beim Laden der Rechnungen</h3>
             <p>{error}</p>
-            <button onClick={fetchSales} className="retry-button large">
+            <button onClick={handleRefresh} className="retry-button large">
               Erneut versuchen
             </button>
           </div>
@@ -385,9 +402,14 @@ export default function SalesPage() {
         {openModal && (
           <div className="modal-overlay">
             <div className="modal-content">
-              <button className="modal-close" onClick={() => setOpenModal(false)}>✖</button>
+              <button 
+                className="modal-close" 
+                onClick={() => setOpenModal(false)}
+              >
+                ✖
+              </button>
               <RechnungCreator 
-                onDone={() => setOpenModal(false)}
+                onDone={handleCreateSuccess} // 🎯 Usar la nueva función
                 refresh={handleRefresh}
               />
             </div>
@@ -397,17 +419,17 @@ export default function SalesPage() {
         {updateModalOpen && saleToEdit && (
           <RechnungUpdate
             sale={saleToEdit}
-            onClose={() => setUpdateModalOpen(false)}
-            onSaved={handleRefresh}
+            onClose={handleUpdateClose} // 🎯 Usar la nueva función
+            onSaved={handleUpdateSuccess} // 🎯 Usar la nueva función
           />
         )}
       </div>
 
       <style jsx>{`
         .sales-container {
-          padding: 20px;
+            margin: 0px;
+          padding: 0px;
           min-height: 100vh;
-          background: #f5f5f5;
         }
 
         /* Header Styles */

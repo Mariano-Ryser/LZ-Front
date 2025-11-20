@@ -12,20 +12,33 @@ export function ListProduct() {
     product,
     products,
     loading,
-    error,
-    refreshTrigger, // ← NUEVO: recibir el trigger
+    error, // error a mapear en el frontend. 
+    setError,
+    refreshTrigger,
     updateProduct,
     handleChange,
     createProduct,
     deleteProductImage,
     deleteProduct,
     setProductToEdit,
+    refreshProducts, // ← NUEVO: agregar refreshProducts aquí
   } = useProduct();
 
   const { isAuthenticated } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // 🎯 NUEVO: Funciones de éxito actualizadas
+  const handleCreateSuccess = () => {
+    setShowModal(false);
+    refreshProducts(); // ← En lugar de handleRefresh
+  };
+
+  const handleUpdateSuccess = () => {
+    setEditingProduct(null);
+    refreshProducts(); // ← En lugar de handleRefresh
+  };
 
   // Filtrar productos
   const filteredProducts = products.filter((p) =>
@@ -42,7 +55,7 @@ export function ListProduct() {
     initialCount: 20,
     loadMoreCount: 20,
     loadDelay: 100, 
-  }, refreshTrigger); // ← NUEVO: pasar el trigger como dependencia
+  }, refreshTrigger);
 
   return (
     <DashboardLayout>
@@ -173,10 +186,11 @@ export function ListProduct() {
             product={editingProduct}
             handleChange={handleChange}
             deleteProductImage={deleteProductImage}
-            updateProduct={(e, updatedProduct) => {
-              updateProduct(e, updatedProduct).then(() => {
-                if (!error) setEditingProduct(null);
-              });
+            updateProduct={async (e, updatedProduct) => {
+              const result = await updateProduct(e, updatedProduct);
+              if (result?.success) {
+                handleUpdateSuccess(); // ← NUEVO: usar handleUpdateSuccess
+              }
             }}
             deleteProduct={deleteProduct}
             loading={loading}
@@ -185,29 +199,32 @@ export function ListProduct() {
           />
         )}
 
-        {showModal && (
-          <ProductCreator
-            product={product}
-            handleChange={handleChange}
-            createProduct={async (e) => {
-              e.preventDefault();
-              const result = await createProduct(e);
-              if (result?.success) {
-                setShowModal(false);
-              }
-            }}
-            loading={loading}
-            error={error}
-            onClose={() => setShowModal(false)}
-          />
-        )}
+      {showModal && (
+  <ProductCreator
+    product={product} // ← Esto debe ser el product del hook useProduct
+    handleChange={handleChange}
+    createProduct={async (e) => {
+      const result = await createProduct(e);
+      if (result?.success) {
+        handleCreateSuccess();
+      }
+    }}
+    loading={loading}
+    error={error}
+    onClose={() => {
+      setShowModal(false);
+      // Limpiar errores al cerrar
+      setError(null);
+    }}
+  />
+)}
       </div>
 
       <style jsx>{`
         .container {
-          padding: 20px;
+          margin: 0px;
+          padding: 0px;
           min-height: 100vh;
-          background: #f8f9fa;
         }
         
         .header {

@@ -184,9 +184,9 @@ const {
 
       <style jsx>{`
         .container { 
-          padding: 20px;
+           margin: 0px;
+          padding: 0px;
           min-height: 100vh;
-          background: #f8f9fa;
         }
         
         .header {

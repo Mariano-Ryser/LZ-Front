@@ -74,6 +74,7 @@ export async function updateSaleAPI(saleId, payload) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+    // 
   });
 
   return handleResponse(res, 'Error actualizando venta');
