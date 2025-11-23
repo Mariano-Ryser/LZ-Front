@@ -1,84 +1,106 @@
+"use client";
+
+
 import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../../../components/auth/AuthProvider';
 
-export const ProductEditor = ({ 
-  product, 
-  handleChange, 
-  updateProduct,
-  deleteProductImage,
-  deleteProduct,
-  loading, 
-  error,
-  onClose 
+
+export const ProductEditor = ({
+product,
+handleChange,
+updateProduct,
+deleteProductImage,
+deleteProduct,
+loading,
+error,
+onClose
 }) => {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+const safeProduct = product || {};
 
-  const { isAuthenticated } = useContext(AuthContext);
 
-  const [localProduct, setLocalProduct] = useState(() => ({
-    ...product,
-  })); 
+const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+const [isSubmitting, setIsSubmitting] = useState(false);
+const [imagePreview, setImagePreview] = useState(null);
 
-  useEffect(() => {
-    if (product.imagen && typeof product.imagen === 'string') {
-      setImagePreview(product.imagen);
-    }
-  }, [product.imagen]);
 
-  const handleLocalChange = (e) => {
-    const { name, value, files } = e.target;
-    
-    if (name === 'imagen' && files?.[0]) {
-      const file = files[0];
-      setLocalProduct(prev => ({
-        ...prev,
-        imagen: file
-      }));
-      
-      // Crear preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setLocalProduct(prev => ({
-        ...prev,
-        [name]: value 
-      }));
-    }
-    
-    handleChange(e);
-  };
+const { isAuthenticated } = useContext(AuthContext);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
-    try {
-      await updateProduct(e, localProduct);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
-  const handleDeleteImage = async () => {
-    if (confirm("Möchten Sie das Bild wirklich löschen?")) {
-      await deleteProductImage(localProduct._id);
-      setLocalProduct(prev => ({ ...prev, imagen: "" }));
-      setImagePreview(null);
-    }
-  };
+const [localProduct, setLocalProduct] = useState(() => ({
+...safeProduct,
+}));
 
-  const handleDeleteProduct = async () => {
-    await deleteProduct(product._id);
-    onClose();
-  };
 
-  return (
+useEffect(() => {
+if (safeProduct?.imagen && typeof safeProduct?.imagen === 'string') {
+setImagePreview(safeProduct.imagen);
+}
+}, [safeProduct?.imagen]);
+
+
+const handleLocalChange = (e) => {
+const { name, value, files } = e.target;
+
+
+if (name === 'imagen' && files?.[0]) {
+const file = files[0];
+setLocalProduct(prev => ({
+...prev,
+imagen: file
+}));
+
+
+const reader = new FileReader();
+reader.onloadend = () => {
+setImagePreview(reader.result);
+};
+reader.readAsDataURL(file);
+
+
+} else {
+setLocalProduct(prev => ({
+...prev,
+[name]: value
+}));
+}
+
+
+handleChange(e);
+};
+
+
+const handleUpdate = async (e) => {
+e.preventDefault();
+if (isSubmitting) return;
+
+
+setIsSubmitting(true);
+try {
+await updateProduct(e, localProduct);
+} finally {
+setIsSubmitting(false);
+}
+};
+
+
+const handleDeleteImage = async () => {
+if (confirm("Möchten Sie das Bild wirklich löschen?")) {
+await deleteProductImage(localProduct?._id);
+setLocalProduct(prev => ({ ...prev, imagen: "" }));
+setImagePreview(null);
+}
+};
+
+
+const handleDeleteProduct = async () => {
+await deleteProduct(localProduct?._id);
+onClose();
+};
+  
+
+return (
+
+  
     <div className="modal-backdrop">
       <div className="modal">
         {/* Header */}

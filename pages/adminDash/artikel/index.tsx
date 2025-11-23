@@ -4,8 +4,8 @@ import { useProduct } from '../../../hooks/useProducts';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
 import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
 import LoadMoreTrigger from '../../../components/shared/LoadMoreTrigger';
-import { ProductCreator } from './components/productCreator';
-import { ProductEditor } from './components/productEditor';
+import { ProductCreator } from './_components/ProductCreator';
+import { ProductEditor } from './_components/ProductEditor';
 
 export function ListProduct() {
   const {
