@@ -1,106 +1,123 @@
 "use client";
 
-
 import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../../../components/auth/AuthProvider';
 
-
 export const ProductEditor = ({
-product,
-handleChange,
-updateProduct,
-deleteProductImage,
-deleteProduct,
-loading,
-error,
-onClose
+  product,
+  handleChange,
+  updateProduct,
+  deleteProductImage,
+  deleteProduct,
+  loading,
+  error,
+  onClose
 }) => {
-const safeProduct = product || {};
+  const safeProduct = product || {};
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
-const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-const [isSubmitting, setIsSubmitting] = useState(false);
-const [imagePreview, setImagePreview] = useState(null);
+  const { isAuthenticated } = useContext(AuthContext);
 
+  const [localProduct, setLocalProduct] = useState(() => ({
+    ...safeProduct,
+  }));
 
-const { isAuthenticated } = useContext(AuthContext);
+  useEffect(() => {
+    if (safeProduct?.imagen && typeof safeProduct?.imagen === 'string') {
+      setImagePreview(safeProduct.imagen);
+    }
+  }, [safeProduct?.imagen]);
 
+  const handleLocalChange = (e) => {
+    const { name, value, files } = e.target;
 
-const [localProduct, setLocalProduct] = useState(() => ({
-...safeProduct,
-}));
+    if (name === 'imagen' && files?.[0]) {
+      const file = files[0];
+      setLocalProduct(prev => ({
+        ...prev,
+        imagen: file
+      }));
 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
 
-useEffect(() => {
-if (safeProduct?.imagen && typeof safeProduct?.imagen === 'string') {
-setImagePreview(safeProduct.imagen);
-}
-}, [safeProduct?.imagen]);
+    } else {
+      setLocalProduct(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
 
+    handleChange(e);
+  };
 
-const handleLocalChange = (e) => {
-const { name, value, files } = e.target;
+  // 🎯 NUEVO: Función específica para manejar campos numéricos
+  const handleNumberChange = (e, fieldName) => {
+    const { value } = e.target;
+    
+    // Permitir campo vacío temporalmente
+    if (value === '') {
+      setLocalProduct(prev => ({
+        ...prev,
+        [fieldName]: ''
+      }));
+    } else {
+      // Solo actualizar si es un número válido y no negativo
+      const numValue = Number(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        setLocalProduct(prev => ({
+          ...prev,
+          [fieldName]: numValue
+        }));
+      }
+    }
+  };
 
+  // 🎯 NUEVO: Función para manejar el blur en campos numéricos
+  const handleNumberBlur = (e, fieldName) => {
+    const { value } = e.target;
+    
+    // Si el campo está vacío, establecer en 0
+    if (value === '') {
+      setLocalProduct(prev => ({
+        ...prev,
+        [fieldName]: 0
+      }));
+    }
+  };
 
-if (name === 'imagen' && files?.[0]) {
-const file = files[0];
-setLocalProduct(prev => ({
-...prev,
-imagen: file
-}));
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
+    try {
+      await updateProduct(e, localProduct);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-const reader = new FileReader();
-reader.onloadend = () => {
-setImagePreview(reader.result);
-};
-reader.readAsDataURL(file);
+  const handleDeleteImage = async () => {
+    if (confirm("Möchten Sie das Bild wirklich löschen?")) {
+      await deleteProductImage(localProduct?._id);
+      setLocalProduct(prev => ({ ...prev, imagen: "" }));
+      setImagePreview(null);
+    }
+  };
 
+  const handleDeleteProduct = async () => {
+    await deleteProduct(localProduct?._id);
+    onClose();
+  };
 
-} else {
-setLocalProduct(prev => ({
-...prev,
-[name]: value
-}));
-}
-
-
-handleChange(e);
-};
-
-
-const handleUpdate = async (e) => {
-e.preventDefault();
-if (isSubmitting) return;
-
-
-setIsSubmitting(true);
-try {
-await updateProduct(e, localProduct);
-} finally {
-setIsSubmitting(false);
-}
-};
-
-
-const handleDeleteImage = async () => {
-if (confirm("Möchten Sie das Bild wirklich löschen?")) {
-await deleteProductImage(localProduct?._id);
-setLocalProduct(prev => ({ ...prev, imagen: "" }));
-setImagePreview(null);
-}
-};
-
-
-const handleDeleteProduct = async () => {
-await deleteProduct(localProduct?._id);
-onClose();
-};
-  
-
-return (
-
-  
+  return (
     <div className="modal-backdrop">
       <div className="modal">
         {/* Header */}
@@ -176,51 +193,24 @@ return (
                 <input
                   type="number"
                   name="stock"
-                  // 
-                  value={localProduct.stock ?? 0}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '') {
-                      handleLocalChange({ ...e, target: { ...e.target, value: '' } });
-                    } else {
-                      const numValue = Number(value);
-                      if (numValue >= 0) {
-                        handleLocalChange(e);
-                      }
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (e.target.value === '') {
-                      handleLocalChange({ ...e, target: { ...e.target, value: 0 } });
-                    }
-                  }}
+                  // 🎯 ACTUALIZADO: Usar las nuevas funciones
+                  value={localProduct.stock === 0 ? 0 : localProduct.stock || ''}
+                  onChange={(e) => handleNumberChange(e, 'stock')}
+                  onBlur={(e) => handleNumberBlur(e, 'stock')}
                   disabled={isSubmitting}
                   min="0"
                 />
               </div>
 
               <div className="form-group">
-                <label>Preis (€)</label>
+                <label>Preis (CHF)</label>
                 <input
                   type="number"
                   name="price"
-                  value={localProduct.price ?? 0}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '') {
-                      handleLocalChange({ ...e, target: { ...e.target, value: '' } });
-                    } else {
-                      const numValue = Number(value);
-                      if (numValue >= 0) {
-                        handleLocalChange(e);
-                      }
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (e.target.value === '') {
-                      handleLocalChange({ ...e, target: { ...e.target, value: 0 } });
-                    }
-                  }}
+                  // 🎯 ACTUALIZADO: Usar las nuevas funciones
+                  value={localProduct.price === 0 ? 0 : localProduct.price || ''}
+                  onChange={(e) => handleNumberChange(e, 'price')}
+                  onBlur={(e) => handleNumberBlur(e, 'price')}
                   disabled={isSubmitting}
                   min="0"
                   step="0.01"

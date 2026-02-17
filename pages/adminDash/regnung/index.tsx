@@ -16,19 +16,68 @@ export default function SalesPage() {
   const [selectedSale, setSelectedSale] = useState(null);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [saleToEdit, setSaleToEdit] = useState(null);
+  
+  // 🎯 NUEVO: Estados para ordenamiento
+  const [sortField, setSortField] = useState("createdAt"); // 'createdAt', 'total', 'clientName'
+  const [sortDirection, setSortDirection] = useState("desc"); // 'asc', 'desc'
 
   const filtered = useMemo(() => {
-    return sales.filter(s => {
-      const clientName = s.clientSnapshot?.name || s.client?.name || "";
-      const matchName = clientName.toLowerCase().includes(search.toLowerCase());
-      const matchLieferschein = s.lieferschein?.toString().includes(search);
-      const matchDate = dateFilter
-        ? new Date(s.createdAt).toISOString().slice(0, 10) === dateFilter
-        : true;
-      const matchStatus = statusFilter ? s.status === statusFilter : true;
-      return (matchName || matchLieferschein) && matchDate && matchStatus;
-    });
-  }, [sales, search, dateFilter, statusFilter]);
+    return sales
+      .filter(s => {
+        const clientName = s.clientSnapshot?.name || s.client?.name || "";
+        const matchName = clientName.toLowerCase().includes(search.toLowerCase());
+        const matchLieferschein = s.lieferschein?.toString().includes(search);
+        const matchDate = dateFilter
+          ? new Date(s.createdAt).toISOString().slice(0, 10) === dateFilter
+          : true;
+        const matchStatus = statusFilter ? s.status === statusFilter : true;
+        return (matchName || matchLieferschein) && matchDate && matchStatus;
+      })
+      // 🎯 NUEVO: Ordenamiento
+      .sort((a, b) => {
+        let aValue, bValue;
+
+        switch (sortField) {
+          case "total":
+            aValue = a.total || 0;
+            bValue = b.total || 0;
+            break;
+          case "clientName":
+            aValue = (a.clientSnapshot?.name || a.client?.name || "").toLowerCase();
+            bValue = (b.clientSnapshot?.name || b.client?.name || "").toLowerCase();
+            break;
+          case "createdAt":
+          default:
+            aValue = new Date(a.createdAt);
+            bValue = new Date(b.createdAt);
+            break;
+        }
+
+        if (sortDirection === "asc") {
+          return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        } else {
+          return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        }
+      });
+  }, [sales, search, dateFilter, statusFilter, sortField, sortDirection]);
+
+  // 🎯 NUEVO: Función para manejar clic en encabezados
+  const handleSort = (field) => {
+    if (sortField === field) {
+      // Cambiar dirección si es el mismo campo
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Nuevo campo, orden descendente por defecto
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
+  // 🎯 NUEVO: Función para obtener ícono de ordenamiento
+  const getSortIcon = (field) => {
+    if (sortField !== field) return "↕️";
+    return sortDirection === "asc" ? "⬆️" : "⬇️";
+  };
 
   const infiniteScrollConfig = {
     initialCount: 20,
@@ -175,6 +224,25 @@ export default function SalesPage() {
               <option value="pending">Ausstehend</option>
               <option value="cancelled">Storniert</option>
             </select>
+            
+            {/* 🎯 NUEVO: Filtro de ordenamiento */}
+            <select
+              className="filter-input"
+              value={`${sortField}-${sortDirection}`}
+              onChange={(e) => {
+                const [field, direction] = e.target.value.split('-');
+                setSortField(field);
+                setSortDirection(direction);
+              }}
+              disabled={loading}
+            >
+              <option value="createdAt-desc">Neueste zuerst</option>
+              <option value="createdAt-asc">Älteste zuerst</option>
+              <option value="total-desc">Preis: Hoch zu Niedrig</option>
+              <option value="total-asc">Preis: Niedrig zu Hoch</option>
+              <option value="clientName-asc">Kunde: A-Z</option>
+              <option value="clientName-desc">Kunde: Z-A</option>
+            </select>
           </div>
           
           <div className="results-info">
@@ -188,6 +256,52 @@ export default function SalesPage() {
                 </>
               )}
             </span>
+            
+            {/* 🎯 NUEVO: Filtros activos */}
+            <div className="active-filters">
+              {(sortField !== "createdAt" || sortDirection !== "desc") && (
+                <span className="active-filter">
+                  Sortierung: {
+                    sortField === "total" 
+                      ? `Preis ${sortDirection === "asc" ? "⬆️" : "⬇️"}`
+                      : sortField === "clientName"
+                      ? `Kunde ${sortDirection === "asc" ? "A-Z" : "Z-A"}`
+                      : `Datum ${sortDirection === "asc" ? "⬆️" : "⬇️"}`
+                  }
+                  <button 
+                    className="clear-filter"
+                    onClick={() => {
+                      setSortField("createdAt");
+                      setSortDirection("desc");
+                    }}
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
+              {statusFilter && (
+                <span className="active-filter">
+                  Status: {getStatusText(statusFilter)}
+                  <button 
+                    className="clear-filter"
+                    onClick={() => setStatusFilter("")}
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
+              {dateFilter && (
+                <span className="active-filter">
+                  Datum: {dateFilter}
+                  <button 
+                    className="clear-filter"
+                    onClick={() => setDateFilter("")}
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -223,9 +337,11 @@ export default function SalesPage() {
                           setSearch('');
                           setDateFilter('');
                           setStatusFilter('');
+                          setSortField('createdAt');
+                          setSortDirection('desc');
                         }}
                       >
-                        Filter zurücksetzen
+                        Alle Filter zurücksetzen
                       </button>
                     </>
                   ) : (
@@ -246,10 +362,25 @@ export default function SalesPage() {
                 <table className="sales-table">
                   <thead>
                     <tr>
-                      <th>Datum</th>
-                      <th>Kunde</th>
+                      <th 
+                        className={`sortable ${sortField === 'createdAt' ? 'active' : ''}`}
+                        onClick={() => handleSort('createdAt')}
+                      >
+                        Datum {getSortIcon('createdAt')}
+                      </th>
+                      <th 
+                        className={`sortable ${sortField === 'clientName' ? 'active' : ''}`}
+                        onClick={() => handleSort('clientName')}
+                      >
+                        Kunde {getSortIcon('clientName')}
+                      </th>
                       <th>Lieferschein</th>
-                      <th>Total</th>
+                      <th 
+                        className={`sortable ${sortField === 'total' ? 'active' : ''}`}
+                        onClick={() => handleSort('total')}
+                      >
+                        Total {getSortIcon('total')}
+                      </th>
                       <th>Status</th>
                       <th>Aktionen</th>
                     </tr>
@@ -266,7 +397,7 @@ export default function SalesPage() {
                           {s.clientSnapshot?.name || s.client?.name || 'Unbekannt'}
                         </td>
                         <td>{s.lieferschein || '-'}</td>
-                        <td className="total-amount">{formatCurrency(s.total)} €</td>
+                        <td className="total-amount">{formatCurrency(s.total)} CHF</td>
                         <td>
                           <span 
                             className="status-tag"
@@ -309,9 +440,11 @@ export default function SalesPage() {
                           setSearch('');
                           setDateFilter('');
                           setStatusFilter('');
+                          setSortField('createdAt');
+                          setSortDirection('desc');
                         }}
                       >
-                        Filter zurücksetzen
+                        Alle Filter zurücksetzen
                       </button>
                     </>
                   ) : (
@@ -356,7 +489,7 @@ export default function SalesPage() {
                       </div>
                       <div className="detail-row">
                         <span>Total:</span>
-                        <span className="card-total">{formatCurrency(s.total)} €</span>
+                        <span className="card-total">{formatCurrency(s.total)} CHF</span>
                       </div>
                     </div>
 
@@ -569,8 +702,52 @@ export default function SalesPage() {
         }
 
         .results-info {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 12px;
           font-size: 0.85rem;
           color: #666;
+        }
+
+        /* 🎯 NUEVO: Filtros activos */
+        .active-filters {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .active-filter {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+
+        .clear-filter {
+          background: none;
+          border: none;
+          color: #1976d2;
+          cursor: pointer;
+          padding: 2px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          font-size: 0.7rem;
+          transition: all 0.2s ease;
+        }
+
+        .clear-filter:hover {
+          background: #bbdefb;
         }
 
         /* Loading and Error States */
@@ -640,6 +817,23 @@ export default function SalesPage() {
           border-bottom: 2px solid #e9ecef;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+        }
+
+        /* 🎯 NUEVO: Encabezados ordenables */
+        .sortable {
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          user-select: none;
+          position: relative;
+        }
+
+        .sortable:hover {
+          background-color: #e9ecef;
+        }
+
+        .sortable.active {
+          background-color: #e3f2fd;
+          color: #1976d2;
         }
 
         .sales-table td {
@@ -865,7 +1059,17 @@ export default function SalesPage() {
           .header-left {
             text-align: center;
           }
-
+          
+          .header-left h1{
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0;
+          }
+          
+          .header-left p {
+            display:none;
+          }
+          
           .desktop-table {
             display: none;
           }
@@ -879,6 +1083,15 @@ export default function SalesPage() {
           }
 
           .filter-input {
+            width: 100%;
+          }
+
+          .results-info {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .active-filters {
             width: 100%;
           }
         }

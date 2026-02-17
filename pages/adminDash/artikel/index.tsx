@@ -6,6 +6,9 @@ import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
 import LoadMoreTrigger from '../../../components/shared/LoadMoreTrigger';
 import { ProductCreator } from './_components/ProductCreator';
 import { ProductEditor } from './_components/ProductEditor';
+import ExportExcelButton from '../../../components/ui/ExportExcelButton'; // Asegúrate de que la ruta sea correcta
+
+
 
 export function ListProduct() {
   const {
@@ -28,7 +31,12 @@ export function ListProduct() {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  // 🎯 NUEVO: Estado para el filtro de stock
+  const [stockFilter, setStockFilter] = useState('all'); // 'all', 'in-stock', 'low-stock', 'out-of-stock'
+  // 🎯 NUEVO: Estado para el ordenamiento
+  const [sortOrder, setSortOrder] = useState('none'); // 'none', 'asc', 'desc'
 
+  
   // 🎯 NUEVO: Funciones de éxito actualizadas
   const handleCreateSuccess = () => {
     setShowModal(false);
@@ -40,10 +48,41 @@ export function ListProduct() {
     refreshProducts(); // ← En lugar de handleRefresh
   };
 
-  // Filtrar productos
-  const filteredProducts = products.filter((p) =>
-    `${p.artikelName} ${p.artikelNumber} ${p.lagerPlatz}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 🎯 NUEVO: Función para determinar el estado del stock
+  const getStockStatus = (product) => {
+    const stock = product.stock || 0;
+    if (stock <= 0) return 'out-of-stock';
+    if (stock < 50) return 'low-stock';
+    return 'in-stock';
+  };
+
+  // 🎯 ACTUALIZADO: Filtrar y ordenar productos
+  const filteredProducts = products
+    .filter((p) => {
+      // Filtro de búsqueda
+      const matchesSearch = `${p.artikelName} ${p.artikelNumber} ${p.lagerPlatz}`.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Filtro de stock
+      const stockStatus = getStockStatus(p);
+      const matchesStock = stockFilter === 'all' || stockStatus === stockFilter;
+      
+      return matchesSearch && matchesStock;
+    })
+    // 🎯 NUEVO: Ordenar productos
+    .sort((a, b) => {
+      if (sortOrder === 'none') return 0;
+      
+      const stockA = a.stock || 0;
+      const stockB = b.stock || 0;
+      
+      if (sortOrder === 'asc') {
+        return stockA - stockB; // Menor a mayor
+      } else if (sortOrder === 'desc') {
+        return stockB - stockA; // Mayor a menor
+      }
+      
+      return 0;
+    });
 
   // Usar el hook de infinite scroll CON EL TRIGGER
   const {
@@ -64,7 +103,17 @@ export function ListProduct() {
           <div className="header-content">
             <h1>Artikelliste</h1>
             <p className="page-subtitle">Verwalten Sie Ihre Produktliste</p>
+              <div className="export-section">
+          <ExportExcelButton 
+            data={filteredProducts}
+            filename="Artikelliste"
+            buttonText="Excel"
+            disabled={filteredProducts.length === 0 || products.length === 0}
+          />
+        </div>
           </div>
+
+          
           {isAuthenticated && (
             <button onClick={() => setShowModal(true)} className="new-btn">
               <span className="plus">+</span>
@@ -73,33 +122,106 @@ export function ListProduct() {
           )}
         </header>
 
-        {/* Buscador */}
+        {/* Buscador y Filtros */}
         <div className="search-section">
-          <div className="search-container">
-            <svg className="search-icon" viewBox="0 0 24 24" width="20" height="20">
-              <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
-            <input
-              type="text"
-              placeholder="Artikel suchen... (Name, Nummer, Lagerplatz)"
-              className="search-input"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button 
-                className="clear-search"
-                onClick={() => setSearchTerm('')}
-              >
-                ✕
-              </button>
-            )}
+          <div className="filters-container">
+            <div className="search-container">
+              <svg className="search-icon" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="Artikel suchen... (Name, Nummer, Lagerplatz)"
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button 
+                  className="clear-search"
+                  onClick={() => setSearchTerm('')}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="filter-group">
+              {/* 🎯 NUEVO: Filtro de Stock */}
+              <div className="stock-filter-container">
+                <label htmlFor="stock-filter" className="filter-label">
+                  Bestandsfilter:
+                </label>
+                <select
+                  id="stock-filter"
+                  className="stock-filter"
+                  value={stockFilter}
+                  onChange={(e) => setStockFilter(e.target.value)}
+                >
+                  <option value="all">Alle Artikel</option>
+                  <option value="in-stock">Auf Lager (≥50)</option>
+                  <option value="low-stock">Wenig Bestand (1-49)</option>
+                  <option value="out-of-stock">Nicht auf Lager (0)</option>
+                </select>
+              </div>
+
+              {/* 🎯 NUEVO: Filtro de Ordenamiento */}
+              <div className="sort-filter-container">
+                <label htmlFor="sort-order" className="filter-label">
+                  Sortieren:
+                </label>
+                <select
+                  id="sort-order"
+                  className="sort-filter"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                >
+                  <option value="none">Standard</option>
+                  <option value="asc">Bestand: ⬆️ Niedrig zu Hoch</option>
+                  <option value="desc">Bestand: ⬇️ Hoch zu Niedrig</option>
+                </select>
+              </div>
+            </div>
           </div>
+
           <div className="search-stats">
             <span className="results-count">
               {visibleProducts.length} von {filteredProducts.length} Artikeln angezeigt
               {hasMore && ` (${filteredProducts.length - visibleProducts.length} mehr verfügbar)`}
             </span>
+            <div className="active-filters">
+              {/* 🎯 NUEVO: Mostrar filtro activo */}
+              {stockFilter !== 'all' && (
+                <span className="active-filter">
+                  Filter: { 
+                    stockFilter === 'in-stock' ? 'Auf Lager' : 
+                    stockFilter === 'low-stock' ? 'Wenig Bestand' : 
+                    'Nicht auf Lager'
+                  }
+                  <button 
+                    className="clear-filter"
+                    onClick={() => setStockFilter('all')}
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
+              {/* 🎯 NUEVO: Mostrar ordenamiento activo */}
+              {sortOrder !== 'none' && (
+                <span className="active-filter">
+                  Sortierung: { 
+                    sortOrder === 'asc' ? 'Niedrig zu Hoch' : 
+                    'Hoch zu Niedrig'
+                  }
+                  <button 
+                    className="clear-filter"
+                    onClick={() => setSortOrder('none')}
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -112,17 +234,39 @@ export function ListProduct() {
             </div>
           ) : visibleProducts.length === 0 ? (
             <div className="empty-state">
-              {searchTerm ? (
+              {searchTerm || stockFilter !== 'all' || sortOrder !== 'none' ? (
                 <>
                   <div className="empty-icon">🔍</div>
                   <h3>Keine Artikel gefunden</h3>
-                  <p>Keine Ergebnisse für "{searchTerm}"</p>
-                  <button 
-                    className="clear-search-btn"
-                    onClick={() => setSearchTerm('')}
-                  >
-                    Suche zurücksetzen
-                  </button>
+                  <p>
+                    {searchTerm && (stockFilter !== 'all' || sortOrder !== 'none')
+                      ? `Keine Ergebnisse für "${searchTerm}" mit den ausgewählten Filtern`
+                      : searchTerm 
+                      ? `Keine Ergebnisse für "${searchTerm}"`
+                      : 'Keine Artikel mit den ausgewählten Filtern'
+                    }
+                  </p>
+                  <div className="empty-state-actions">
+                    {searchTerm && (
+                      <button 
+                        className="clear-search-btn"
+                        onClick={() => setSearchTerm('')}
+                      >
+                        Suche zurücksetzen
+                      </button>
+                    )}
+                    {(stockFilter !== 'all' || sortOrder !== 'none') && (
+                      <button 
+                        className="clear-search-btn"
+                        onClick={() => {
+                          setStockFilter('all');
+                          setSortOrder('none');
+                        }}
+                      >
+                        Alle Filter zurücksetzen
+                      </button>
+                    )}
+                  </div>
                 </>
               ) : (
                 <>
@@ -139,8 +283,15 @@ export function ListProduct() {
                   <tr>
                     <th className="col-name">Artikelname</th>
                     <th className="col-lager">Lagerplatz</th>
-                    <th className="col-price">Preis (€)</th>
-                    <th className="col-stock">Bestand</th>
+                    <th className="col-price">Preis (CHF)</th>
+                    <th className="col-stock">
+                      Bestand
+                      {sortOrder !== 'none' && (
+                        <span className="sort-indicator">
+                          {sortOrder === 'asc' ? ' ⬆️' : ' ⬇️'}
+                        </span>
+                      )}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,10 +309,10 @@ export function ListProduct() {
                       </td>
                       <td className="product-lager">{product.lagerPlatz || '-'}</td>
                       <td className="product-price">
-                        {product.price ? `€${parseFloat(product.price).toFixed(2)}` : '-'}
+                        {product.price ? `CHF ${parseFloat(product.price).toFixed(2)}` : '-'}
                       </td>
                       <td className="product-stock">
-                        <span className={`stock-badge ${(product.stock || 0) <= 0 ? 'out-of-stock' : (product.stock || 0) < 10 ? 'low-stock' : 'in-stock'}`}>
+                        <span className={`stock-badge ${getStockStatus(product)}`}>
                           {product.stock || 0}
                         </span>
                       </td>
@@ -282,17 +433,25 @@ export function ListProduct() {
           font-weight: bold;
         }
         
-        /* Buscador */
+        /* Buscador y Filtros */
         .search-section {
           margin-bottom: 24px;
+        }
+        
+        .filters-container {
+          display: flex;
+          gap: 16px;
+          align-items: flex-end;
+          flex-wrap: wrap;
+          margin-bottom: 8px;
         }
         
         .search-container {
           position: relative;
           display: flex;
           align-items: center;
-          max-width: 600px;
-          margin-bottom: 8px;
+          flex: 1;
+          min-width: 300px;
         }
         
         .search-icon {
@@ -342,14 +501,108 @@ export function ListProduct() {
           color: #495057;
         }
         
+        /* 🎯 NUEVO: Grupo de filtros */
+        .filter-group {
+          display: flex;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+        
+        /* 🎯 NUEVO: Estilos para el filtro de stock */
+        .stock-filter-container {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 200px;
+        }
+        
+        /* 🎯 NUEVO: Estilos para el filtro de ordenamiento */
+        .sort-filter-container {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 220px;
+        }
+        
+        .filter-label {
+          font-size: 0.85rem;
+          color: #495057;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        
+        .stock-filter,
+        .sort-filter {
+          padding: 12px 16px;
+          border: 2px solid #e9ecef;
+          border-radius: 8px;
+          font-size: 0.95rem;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stock-filter:focus,
+        .sort-filter:focus {
+          outline: none;
+          border-color: #4caf50;
+          box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
         .search-stats {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           min-height: 20px;
+          flex-wrap: wrap;
+          gap: 12px;
         }
         
         .results-count {
           font-size: 0.85rem;
           color: #6c757d;
           font-weight: 500;
+        }
+        
+        /* 🎯 NUEVO: Contenedor para filtros activos */
+        .active-filters {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        
+        /* 🎯 NUEVO: Estilos para el filtro activo */
+        .active-filter {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 6px 12px;
+          border-radius: 16px;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+        
+        .clear-filter {
+          background: none;
+          border: none;
+          color: #1976d2;
+          cursor: pointer;
+          padding: 2px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          font-size: 0.7rem;
+          transition: all 0.2s ease;
+        }
+        
+        .clear-filter:hover {
+          background: #bbdefb;
         }
         
         /* Tabla Excel */
@@ -447,6 +700,12 @@ export function ListProduct() {
           color: #721c24;
         }
         
+        /* 🎯 NUEVO: Indicador de ordenamiento en la tabla */
+        .sort-indicator {
+          margin-left: 4px;
+          font-size: 0.9em;
+        }
+        
         /* Estados de carga y vacío */
         .loading {
           padding: 60px 20px;
@@ -498,6 +757,14 @@ export function ListProduct() {
           line-height: 1.5;
         }
         
+        /* 🎯 NUEVO: Acciones en estado vacío */
+        .empty-state-actions {
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        
         .clear-search-btn {
           background: #4caf50;
           color: white;
@@ -535,8 +802,23 @@ export function ListProduct() {
             font-size: 1.75rem;
           }
           
+          .filters-container {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          
+          .filter-group {
+            width: 100%;
+          }
+          
           .search-container {
-            max-width: none;
+            min-width: auto;
+          }
+          
+          .stock-filter-container,
+          .sort-filter-container {
+            min-width: auto;
+            width: 100%;
           }
           
           .table-container {
@@ -545,6 +827,16 @@ export function ListProduct() {
           
           .products-table {
             min-width: 500px;
+          }
+          
+          .search-stats {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+          
+          .active-filters {
+            width: 100%;
           }
         }
         
@@ -564,6 +856,17 @@ export function ListProduct() {
           .search-input {
             font-size: 0.9rem;
             padding: 10px 14px 10px 42px;
+          }
+          
+          .stock-filter,
+          .sort-filter {
+            padding: 10px 14px;
+            font-size: 0.9rem;
+          }
+          
+          .empty-state-actions {
+            flex-direction: column;
+            align-items: center;
           }
         }
       `}</style>

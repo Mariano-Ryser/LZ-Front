@@ -232,7 +232,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Preis (€)</label>
+                  <label>Preis (CHF)</label>
                   <input
                     type="number"
                     name="price"

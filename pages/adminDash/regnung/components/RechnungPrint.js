@@ -13,7 +13,7 @@ export default function RechnungPrint({ sale, onClose }) {
   const printRef = useRef();
 
   const companyInfo = {
-    name: "Meine Firma GmbH",
+    name: "Meine Firma",
     address: "Musterstraße 123, 8000 Zürich",
     phone: "+41 44 123 4567",
     email: "rechnung@firma.com",
@@ -400,8 +400,8 @@ export default function RechnungPrint({ sale, onClose }) {
                       </div>
                     </td>
                     <td className="text-center">{item?.quantity || 0}</td>
-                    <td className="text-right">{(item?.unitPrice || 0).toFixed(2)} €</td>
-                    <td className="text-right">{lineTotal.toFixed(2)} €</td>
+                    <td className="text-right">{(item?.unitPrice || 0).toFixed(2)} CHF</td>
+                    <td className="text-right">{lineTotal.toFixed(2)} CHF</td>
                   </tr>
                 );
               })}
@@ -435,21 +435,21 @@ export default function RechnungPrint({ sale, onClose }) {
             <div className="totals-box">
               <div className="total-row">
                 <span>Zwischensumme:</span>
-                <span>{subtotal.toFixed(2)} €</span>
+                <span>{subtotal.toFixed(2)} CHF</span>
               </div>
               {discount > 0 && (
                 <div className="total-row">
                   <span>Rabatt:</span>
-                  <span>-{discount.toFixed(2)} €</span>
+                  <span>-{discount.toFixed(2)} CHF</span>
                 </div>
               )}
               <div className="total-row">
                 <span>MWSt ({(taxRate * 100).toFixed(1)}%):</span>
-                <span>{tax.toFixed(2)} €</span>
+                <span>{tax.toFixed(2)} CHF</span>
               </div>
               <div className="total-row final">
                 <span>Gesamtbetrag:</span>
-                <span>{total.toFixed(2)} €</span>
+                <span>{total.toFixed(2)} CHF</span>
               </div>
             </div>
           </div>
@@ -535,6 +535,7 @@ export default function RechnungPrint({ sale, onClose }) {
         @media (max-width: 768px) {
           .modal.compact {
             padding: 15px;
+            font-size: 11px;
           }
           
           .print-btn {

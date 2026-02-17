@@ -17,7 +17,6 @@ export function useSales(limit = 20) {
   const fetchSales = async (pageToLoad = 1, isRefresh = false) => {
     setLoading(true);
     setError(null);
-
     try {
       console.log(`📡 Fetching sales page ${pageToLoad}...`);
       const data = await getSales(pageToLoad, limit);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useProduct } from '../hooks/useProducts';
 import MapaAlmacen from '../components/MapaAlmacen';
 import { AnimatedText, AnimatedWords, AnimatedPhrases } from "../components/animations"
+import VoiceSearchInput from "../components/VoiceSearchInput";
 
 export default function Home() {
   const { products, loading, error } = useProduct();
@@ -68,12 +69,21 @@ export default function Home() {
           duration={1.2}
           interval={5}
         />
-          <input
-            type="text"
-            placeholder="N° Articulo o artikelName"
-            value={busqueda}
-            onChange={handleBusqueda}
-          />
+           <AnimatedPhrases
+  phrases={phrases}
+  animationType="zoom"
+  duration={1.2}
+  interval={5}
+/>
+
+<VoiceSearchInput
+  value={busqueda}
+  onChange={(texto) =>
+    handleBusqueda({ target: { value: texto } })
+  }
+  placeholder="N° Artículo o Artikelname"
+/>
+
 
           {loading && <p>Cargando artículos...</p>}
           {error && <p>Error al cargar productos.</p>}

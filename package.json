@@ -17,7 +17,8 @@
     "next-auth": "^4.24.11",
     "react-draggable": "^4.5.0",
     "react-icons": "^4.10.1",
-    "styled-jsx": "^5.0.2"
+    "styled-jsx": "^5.0.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "eslint": "8.18.0",

@@ -63,54 +63,55 @@ export default function RechnungUpdate({ sale, onClose, onSaved }) {
   };
 
   const handleSave = async () => {
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
+  if (isSubmitting) return;
+  
+  setIsSubmitting(true);
 
-    try {
-      if (!editableSale.client?._id && !editableSale.clientSnapshot?._id) {
-        alert("Bitte wählen Sie einen Kunden aus");
-        return;
-      }
-
-      if (editableSale.items.some(i => !i.productId)) {
-        alert("Bitte wählen Sie alle Artikel aus");
-        return;
-      }
-
-      if (editableSale.items.some(i => i.quantity <= 0)) {
-        alert("Die Menge muss größer als 0 sein");
-        return;
-      }
-
-      if (editableSale.items.some(i => i.unitPrice < 0)) {
-        alert("Der Preis darf nicht negativ sein");
-        return;
-      }
-
-      const payload = {
-        clientId: editableSale.client?._id || editableSale.clientSnapshot?._id,
-        status: editableSale.status,
-        items: editableSale.items.map(i => ({
-          productId: i.productId,
-          quantity: Number(i.quantity),
-          unitPrice: Number(i.unitPrice),
-        })),
-      };
-      
-      const res = await updateSale(editableSale._id, payload);
-      if (res.success) {
-        if (onSaved) onSaved();
-      } else {
-        alert("Fehler beim Speichern: " + (res.message || "Unbekannter Fehler"));
-      }
-    } catch (err) {
-      alert("Fehler beim Speichern: " + err.message);
-    } finally {
-      setIsSubmitting(false);
+  try {
+    if (!editableSale.client?._id && !editableSale.clientSnapshot?._id) {
+      alert("Bitte wählen Sie einen Kunden aus");
+      return;
     }
-  };
 
+    if (editableSale.items.some(i => !i.productId)) {
+      alert("Bitte wählen Sie alle Artikel aus");
+      return;
+    }
+
+    if (editableSale.items.some(i => i.quantity <= 0)) {
+      alert("Die Menge muss größer als 0 sein");
+      return;
+    }
+
+    if (editableSale.items.some(i => i.unitPrice < 0)) {
+      alert("Der Preis darf nicht negativ sein");
+      return;
+    }
+
+    const payload = {
+      clientId: editableSale.client?._id || editableSale.clientSnapshot?._id,
+      status: editableSale.status,
+      items: editableSale.items.map(i => ({
+        productId: i.productId,
+        quantity: Number(i.quantity),
+        unitPrice: Number(i.unitPrice),
+      })),
+      // ✅ NUEVO: Incluir el porcentaje de impuesto
+      tax: 10 // 10% IVA
+    };
+    
+    const res = await updateSale(editableSale._id, payload);
+    if (res.success) {
+      if (onSaved) onSaved();
+    } else {
+      alert("Fehler beim Speichern: " + (res.message || "Unbekannter Fehler"));
+    }
+  } catch (err) {
+    alert("Fehler beim Speichern: " + err.message);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   const subtotal = editableSale.items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
   const taxAmount = Number((subtotal * 0.10).toFixed(2));
   const total = Number((subtotal + taxAmount).toFixed(2));
@@ -174,8 +175,8 @@ export default function RechnungUpdate({ sale, onClose, onSaved }) {
                   <tr>
                     <th>Artikel</th>
                     <th>Menge</th>
-                    <th>Einzelpreis (€)</th>
-                    <th>Gesamt (€)</th>
+                    <th>Einzelpreis (CHF)</th>
+                    <th>Gesamt (CHF)</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -223,7 +224,7 @@ export default function RechnungUpdate({ sale, onClose, onSaved }) {
                         />
                       </td>
                       <td className="total-column">
-                        {(item.quantity * item.unitPrice).toFixed(2)} €
+                        {(item.quantity * item.unitPrice).toFixed(2)} CHF
                       </td>
                       <td className="actions-column">
                         <button 
@@ -254,15 +255,15 @@ export default function RechnungUpdate({ sale, onClose, onSaved }) {
           <div className="totals-section">
             <div className="total-row">
               <span>Zwischensumme:</span>
-              <span>{subtotal.toFixed(2)} €</span>
+              <span>{subtotal.toFixed(2)} CHF</span>
             </div>
             <div className="total-row">
               <span>10% MwSt.:</span>
-              <span>{taxAmount.toFixed(2)} €</span>
+              <span>{taxAmount.toFixed(2)} CHF</span>
             </div>
             <div className="total-row grand-total">
               <span>Gesamtsumme:</span>
-              <span>{total.toFixed(2)} €</span>
+              <span>{total.toFixed(2)} CHF</span>
             </div>
           </div>
         </div>
@@ -306,9 +307,11 @@ export default function RechnungUpdate({ sale, onClose, onSaved }) {
           align-items: center;
           z-index: 1000;
           padding: 20px;
+          
         }
 
         .modal {
+          
           background: white;
           width: 95%;
           max-width: 900px;

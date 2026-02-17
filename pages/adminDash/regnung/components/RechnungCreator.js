@@ -183,7 +183,7 @@ export default function RechnungCreator({ onDone, refresh }) {
                           setShowClientAutocomplete(false);
                         }}
                       >
-                        <span>{c.name}</span>
+                        <span className="client-name">{c.name}</span>
                         {c.email && <span className="email">({c.email})</span>}
                       </div>
                     ))}
@@ -206,68 +206,77 @@ export default function RechnungCreator({ onDone, refresh }) {
             </div>
           </div>
 
-          {/* Artikel Table */}
+          {/* Artikel Section */}
           <div className="table-section">
-            <h3>Artikel ({lines.length})</h3>
+            <div className="section-header">
+              <h3>Artikel ({lines.length})</h3>
+            </div>
             
-            <div className="table-container">
-              <table className="items-table">
-                <thead>
-                  <tr>
-                    <th>Artikel</th>
-                    <th>Menge</th>
-                    <th>Einzelpreis (€)</th>
-                    <th>Gesamt (€)</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lines.map((line, i) => {
-                    const matches = filteredProducts(i);
-                    return (
-                      <tr key={i} className={isSubmitting ? "row-disabled" : ""}>
-                        <td className="product-cell">
-                          <div className="autocomplete-wrapper" ref={el => autocompleteRefs.current[i] = el}>
-                            <input
-                              type="text"
-                              placeholder="Artikel suchen..."
-                              value={searches[i]}
-                              onChange={e => {
-                                const val = e.target.value;
-                                setSearches(prev => prev.map((s, idx) => idx === i ? val : s));
-                                updateLine(i, { productId: "" });
-                                setShowAutocomplete(prev => prev.map((s, idx) => idx === i ? true : s));
-                              }}
-                              onFocus={() => setShowAutocomplete(prev => prev.map((s, idx) => idx === i ? true : s))}
-                              disabled={isSubmitting}
-                            />
-                            {showAutocomplete[i] && matches.length > 0 && (
-                              <div className="autocomplete-dropdown">
-                                {matches.map(p => (
-                                  <div 
-                                    key={p._id}
-                                    className="autocomplete-item"
-                                    onClick={() => {
-                                      updateLine(i, { productId: p._id, unitPrice: p.price });
-                                      setSearches(prev => prev.map((s, idx) => idx === i ? p.artikelName : s));
-                                      setShowAutocomplete(prev => prev.map((s, idx) => idx === i ? false : s));
-                                    }}
-                                  >
-                                    {p.artikelName} ({p.price} €)
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="quantity-cell">
+            <div className="items-container">
+              {lines.map((line, i) => {
+                const matches = filteredProducts(i);
+                const lineTotal = line.quantity && line.unitPrice ? (line.quantity * line.unitPrice).toFixed(2) : '0.00';
+                
+                return (
+                  <div key={i} className={`item-card ${isSubmitting ? "row-disabled" : ""}`}>
+                    <div className="item-header">
+                      <span className="item-number">Artikel {i + 1}</span>
+                      <button 
+                        onClick={() => removeLine(i)}
+                        disabled={lines.length <= 1 || isSubmitting}
+                        className="remove-btn"
+                        title="Artikel entfernen"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="item-content">
+                      <div className="form-group">
+                        <label>Artikel</label>
+                        <div className="autocomplete-wrapper" ref={el => autocompleteRefs.current[i] = el}>
+                          <input
+                            type="text"
+                            placeholder="Artikel suchen..."
+                            value={searches[i]}
+                            onChange={e => {
+                              const val = e.target.value;
+                              setSearches(prev => prev.map((s, idx) => idx === i ? val : s));
+                              updateLine(i, { productId: "" });
+                              setShowAutocomplete(prev => prev.map((s, idx) => idx === i ? true : s));
+                            }}
+                            onFocus={() => setShowAutocomplete(prev => prev.map((s, idx) => idx === i ? true : s))}
+                            disabled={isSubmitting}
+                          />
+                          {showAutocomplete[i] && matches.length > 0 && (
+                            <div className="autocomplete-dropdown">
+                              {matches.map(p => (
+                                <div 
+                                  key={p._id}
+                                  className="autocomplete-item"
+                                  onClick={() => {
+                                    updateLine(i, { productId: p._id, unitPrice: p.price });
+                                    setSearches(prev => prev.map((s, idx) => idx === i ? p.artikelName : s));
+                                    setShowAutocomplete(prev => prev.map((s, idx) => idx === i ? false : s));
+                                  }}
+                                >
+                                  {p.artikelName} <span className="product-price">({p.price} CHF)</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="item-details">
+                        <div className="form-group">
+                          <label>Menge</label>
                           <input
                             type="number"
                             min="1"
                             value={line.quantity}
                             onChange={e => {
                               const value = e.target.value;
-                              // Permitir campo vacío temporalmente
                               if (value === '') {
                                 updateLine(i, { quantity: '' });
                               } else {
@@ -278,15 +287,16 @@ export default function RechnungCreator({ onDone, refresh }) {
                               }
                             }}
                             onBlur={e => {
-                              // Si está vacío al salir, poner 1
                               if (e.target.value === '') {
                                 updateLine(i, { quantity: 1 });
                               }
                             }}
                             disabled={isSubmitting}
                           />
-                        </td>
-                        <td className="price-cell">
+                        </div>
+                        
+                        <div className="form-group">
+                          <label>Einzelpreis (CHF)</label>
                           <input
                             type="number"
                             min="0"
@@ -294,7 +304,6 @@ export default function RechnungCreator({ onDone, refresh }) {
                             value={line.unitPrice}
                             onChange={e => {
                               const value = e.target.value;
-                              // Permitir campo vacío temporalmente
                               if (value === '') {
                                 updateLine(i, { unitPrice: '' });
                               } else {
@@ -305,32 +314,23 @@ export default function RechnungCreator({ onDone, refresh }) {
                               }
                             }}
                             onBlur={e => {
-                              // Si está vacío al salir, poner 0
                               if (e.target.value === '') {
                                 updateLine(i, { unitPrice: 0 });
                               }
                             }}
                             disabled={isSubmitting}
                           />
-                        </td>
-                        <td className="total-column">
-                          {line.quantity && line.unitPrice ? (line.quantity * line.unitPrice).toFixed(2) : '0.00'} €
-                        </td>
-                        <td className="actions-column">
-                          <button 
-                            onClick={() => removeLine(i)}
-                            disabled={lines.length <= 1 || isSubmitting}
-                            className="remove-btn"
-                            title="Artikel entfernen"
-                          >
-                            ✕
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </div>
+                        
+                        <div className="form-group total-group">
+                          <label>Gesamt (CHF)</label>
+                          <div className="total-display">{lineTotal} CHF</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <button 
@@ -346,15 +346,15 @@ export default function RechnungCreator({ onDone, refresh }) {
           <div className="totals-section">
             <div className="total-row">
               <span>Zwischensumme:</span>
-              <span>{subtotal.toFixed(2)} €</span>
+              <span>{subtotal.toFixed(2)} CHF</span>
             </div>
             <div className="total-row">
               <span>10% MwSt.:</span>
-              <span>{taxAmount.toFixed(2)} €</span>
+              <span>{taxAmount.toFixed(2)} CHF</span>
             </div>
             <div className="total-row grand-total">
               <span>Gesamtsumme:</span>
-              <span>{total.toFixed(2)} €</span>
+              <span>{total.toFixed(2)} CHF</span>
             </div>
           </div>
         </div>
@@ -397,17 +397,17 @@ export default function RechnungCreator({ onDone, refresh }) {
           justify-content: center;
           align-items: center;
           z-index: 1000;
-          padding: 20px;
+          padding: 16px;
         }
 
         .modal {
           background: white;
-          width: 95%;
-          max-width: 900px;
-          max-height: 90vh;
+          width: 100%;
+          max-width: 800px;
+          max-height: 95vh;
           overflow: hidden;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          border-radius: 12px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
           display: flex;
           flex-direction: column;
         }
@@ -432,11 +432,17 @@ export default function RechnungCreator({ onDone, refresh }) {
         .close-btn {
           background: none;
           border: none;
-          font-size: 18px;
+          font-size: 20px;
           cursor: pointer;
-          padding: 4px 8px;
-          border-radius: 4px;
+          padding: 8px;
+          border-radius: 6px;
           color: #666;
+          transition: all 0.2s;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .close-btn:hover:not(:disabled) {
@@ -460,19 +466,19 @@ export default function RechnungCreator({ onDone, refresh }) {
         .form-section {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 16px;
+          gap: 20px;
           margin-bottom: 24px;
         }
 
         .form-group {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 8px;
         }
 
         .form-group label {
           font-weight: 600;
-          color: #495057;
+          color: #374151;
           font-size: 0.9rem;
         }
 
@@ -482,55 +488,58 @@ export default function RechnungCreator({ onDone, refresh }) {
 
         .form-group input,
         .form-group select {
-          padding: 8px 12px;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          font-size: 0.95rem;
+          padding: 12px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          font-size: 1rem;
           width: 100%;
           background: white;
+          transition: all 0.2s;
         }
 
         .form-group input:focus,
         .form-group select:focus {
           outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .form-group input:disabled,
         .form-group select:disabled {
-          background-color: #f8f9fa;
-          color: #6c757d;
+          background-color: #f9fafb;
+          color: #6b7280;
           cursor: not-allowed;
         }
 
-        /* Autocomplete - FIXED POSITIONING */
+        /* Autocomplete */
         .autocomplete-dropdown {
           position: absolute;
           top: 100%;
           left: 0;
           right: 0;
           background: white;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
           max-height: 200px;
-          width: 400px;
           overflow-y: auto;
-          z-index: 1001; /* Mayor z-index para que esté por encima */
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          margin-top: 2px;
+          z-index: 1001;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          margin-top: 4px;
         }
 
         .autocomplete-item {
-          padding: 10px 12px;
+          padding: 12px;
           cursor: pointer;
-          border-bottom: 1px solid #f1f3f4;
-          font-size: 0.9rem;
+          border-bottom: 1px solid #f3f4f6;
+          font-size: 0.95rem;
           transition: background-color 0.2s;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
         }
 
         .autocomplete-item:hover {
-          background: #007bff;
+          background: #3b82f6;
           color: white;
         }
 
@@ -538,108 +547,84 @@ export default function RechnungCreator({ onDone, refresh }) {
           border-bottom: none;
         }
 
+        .client-name {
+          font-weight: 500;
+        }
+
         .email {
-          color: #6c757d;
+          color: #6b7280;
           font-size: 0.85rem;
-          margin-left: 8px;
         }
 
-        .autocomplete-item:hover .email {
-          color: #e0e0e0;
+        .autocomplete-item:hover .email,
+        .autocomplete-item:hover .product-price {
+          color: #e5e7eb;
         }
 
-        /* Table Section */
-        .table-section h3 {
-          margin: 0 0 16px 0;
+        .product-price {
+          color: #059669;
+          font-size: 0.85rem;
+          margin-left: 4px;
+        }
+
+        /* Table Section - Mobile Cards */
+        .table-section {
+          margin-bottom: 24px;
+        }
+
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+
+        .section-header h3 {
+          margin: 0;
           font-size: 1.1rem;
           color: #333;
           font-weight: 600;
         }
 
-        .table-container {
-          border: 1px solid #dee2e6;
-          border-radius: 4px;
-          margin-bottom: 12px;
-          position: relative; /* Para el autocomplete */
+        .items-container {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-bottom: 16px;
         }
 
-        .items-table {
-          width: 100%;
-          border-collapse: collapse;
-          min-width: 600px;
-        }
-
-        .items-table th {
+        .item-card {
           background: #f8f9fa;
-          padding: 12px 8px;
-          font-weight: 600;
-          color: #495057;
-          font-size: 0.85rem;
-          text-align: left;
-          border-bottom: 1px solid #dee2e6;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 16px;
+          transition: all 0.2s;
         }
 
-        .items-table td {
-          padding: 12px 8px;
-          border-bottom: 1px solid #f1f3f4;
-          position: relative; /* Para el autocomplete */
-        }
-
-        .items-table tr:last-child td {
-          border-bottom: none;
-        }
-
-        .items-table tr.row-disabled {
+        .item-card.row-disabled {
           opacity: 0.6;
           pointer-events: none;
         }
 
-        /* Celdas específicas para mejor control */
-        .product-cell {
-          position: relative;
-          min-width: 200px;
+        .item-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #e5e7eb;
         }
 
-        .quantity-cell,
-        .price-cell {
-          min-width: 100px;
-        }
-
-        .items-table input {
-          width: 100%;
-          padding: 8px 10px;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          font-size: 0.9rem;
-          background: white;
-        }
-
-        .items-table input:focus {
-          outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-        }
-
-        .items-table input:disabled {
-          background-color: #f8f9fa;
-          cursor: not-allowed;
-        }
-
-        .total-column {
+        .item-number {
           font-weight: 600;
-          color: #333;
-          min-width: 100px;
-        }
-
-        .actions-column {
-          width: 60px;
-          text-align: center;
+          color: #374151;
+          font-size: 0.95rem;
         }
 
         .remove-btn {
-          background: #dc3545;
+          background: #ef4444;
           border: none;
-          border-radius: 4px;
+          border-radius: 6px;
           width: 32px;
           height: 32px;
           display: flex;
@@ -649,71 +634,99 @@ export default function RechnungCreator({ onDone, refresh }) {
           color: white;
           font-size: 14px;
           transition: all 0.2s;
+          flex-shrink: 0;
         }
 
         .remove-btn:hover:not(:disabled) {
-          background: #c82333;
+          background: #dc2626;
           transform: scale(1.05);
         }
 
         .remove-btn:disabled {
           opacity: 0.4;
           cursor: not-allowed;
-          background: #6c757d;
+          background: #6b7280;
+        }
+
+        .item-content {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .item-details {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .total-group {
+          grid-column: 1 / -1;
+        }
+
+        .total-display {
+          padding: 12px;
+          background: white;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          font-weight: 600;
+          color: #059669;
+          text-align: center;
         }
 
         /* Add Button */
         .add-btn {
-          background: #28a745;
+          background: #10b981;
           border: none;
-          border-radius: 4px;
-          padding: 12px 16px;
+          border-radius: 8px;
+          padding: 14px 20px;
           color: white;
           cursor: pointer;
-          font-weight: 500;
+          font-weight: 600;
           width: 100%;
           transition: all 0.2s;
+          font-size: 1rem;
         }
 
         .add-btn:hover:not(:disabled) {
-          background: #218838;
+          background: #059669;
           transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .add-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
-          background: #6c757d;
+          background: #6b7280;
         }
 
         /* Totals */
         .totals-section {
           background: #f8f9fa;
-          padding: 16px;
-          border-radius: 4px;
-          margin-top: 20px;
-          border: 1px solid #e9ecef;
+          padding: 20px;
+          border-radius: 12px;
+          border: 1px solid #e5e7eb;
         }
 
         .total-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 8px 0;
-          font-size: 0.95rem;
+          padding: 12px 0;
+          font-size: 1rem;
         }
 
         .total-row:not(.grand-total) {
-          color: #6c757d;
+          color: #6b7280;
         }
 
         .grand-total {
           font-weight: 700;
-          font-size: 1.05rem;
-          color: #333;
-          border-top: 2px solid #dee2e6;
+          font-size: 1.1rem;
+          color: #111827;
+          border-top: 2px solid #d1d5db;
           margin-top: 8px;
-          padding-top: 12px;
+          padding-top: 16px;
         }
 
         /* Footer */
@@ -722,16 +735,16 @@ export default function RechnungCreator({ onDone, refresh }) {
           justify-content: flex-end;
           gap: 12px;
           padding: 20px 24px;
-          border-top: 1px solid #e0e0e0;
+          border-top: 1px solid #e5e7eb;
           background: #f8f9fa;
         }
 
         .btn {
-          padding: 12px 24px;
+          padding: 14px 24px;
           border: none;
-          border-radius: 4px;
-          font-weight: 500;
-          font-size: 0.95rem;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 1rem;
           cursor: pointer;
           min-width: 140px;
           display: flex;
@@ -748,28 +761,30 @@ export default function RechnungCreator({ onDone, refresh }) {
 
         .btn-cancel {
           background: white;
-          color: #6c757d;
-          border: 1px solid #6c757d;
+          color: #6b7280;
+          border: 2px solid #d1d5db;
         }
 
         .btn-cancel:hover:not(:disabled) {
-          background: #f8f9fa;
+          background: #f9fafb;
+          border-color: #9ca3af;
         }
 
         .btn-save {
-          background: #007bff;
+          background: #3b82f6;
           color: white;
         }
 
         .btn-save:hover:not(:disabled) {
-          background: #0056b3;
+          background: #2563eb;
           transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         /* Loading Spinner */
         .loading-spinner {
           border: 2px solid #f3f3f3;
-          border-top: 2px solid #007bff;
+          border-top: 2px solid #3b82f6;
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -787,15 +802,21 @@ export default function RechnungCreator({ onDone, refresh }) {
         /* Responsive Design */
         @media (max-width: 768px) {
           .modal-backdrop {
-            padding: 10px;
+            padding: 12px;
+            align-items: flex-end;
           }
 
           .modal {
-            max-height: 95vh;
+            max-height: 90vh;
+            border-radius: 16px 16px 0 0;
           }
 
           .modal-header {
             padding: 16px 20px;
+          }
+
+          .modal-header h2 {
+            font-size: 1.2rem;
           }
 
           .modal-body {
@@ -804,49 +825,95 @@ export default function RechnungCreator({ onDone, refresh }) {
 
           .form-section {
             grid-template-columns: 1fr;
+            gap: 16px;
+          }
+
+          .item-details {
+            grid-template-columns: 1fr;
             gap: 12px;
-          }
-
-          .table-container {
-            margin-bottom: 8px;
-          }
-
-          .items-table th,
-          .items-table td {
-            padding: 10px 6px;
           }
 
           .modal-footer {
             padding: 16px 20px;
             flex-direction: column-reverse;
+            gap: 12px;
           }
 
           .btn {
             width: 100%;
+            min-width: auto;
           }
 
           .autocomplete-dropdown {
-            z-index: 1002; /* Aún mayor en móviles */
+            position: fixed;
+            top: auto;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 50vh;
+            border-radius: 16px 16px 0 0;
+            margin-top: 0;
+            z-index: 1002;
           }
         }
 
         @media (max-width: 480px) {
+          .modal-backdrop {
+            padding: 8px;
+          }
+
+          .modal-header {
+            padding: 14px 16px;
+          }
+
+          .modal-body {
+            padding: 16px;
+          }
+
+          .form-group input,
+          .form-group select {
+            padding: 14px 12px;
+            font-size: 16px; /* Prevent zoom on iOS */
+          }
+
+          .item-card {
+            padding: 12px;
+          }
+
+          .totals-section {
+            padding: 16px;
+          }
+
+          .total-row {
+            font-size: 0.95rem;
+          }
+
+          .grand-total {
+            font-size: 1.05rem;
+          }
+        }
+
+        @media (max-width: 320px) {
           .modal-header h2 {
             font-size: 1.1rem;
           }
 
-          .items-table {
-            min-width: 500px;
-          }
-
-          .items-table input {
-            padding: 6px 8px;
+          .form-group label {
             font-size: 0.85rem;
           }
 
-          .autocomplete-item {
-            padding: 8px 10px;
-            font-size: 0.85rem;
+          .btn {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+          }
+        }
+
+        /* Safe area for notched devices */
+        @supports(padding: max(0px)) {
+          .modal-backdrop {
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
           }
         }
       `}</style>

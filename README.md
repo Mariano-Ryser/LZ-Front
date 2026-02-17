@@ -42,7 +42,46 @@ medida cel 380 x 700
 
 # {{}}
 
-/my-front
+/backend
+├─.github
+├─ config
+│   └─ cloudinary.js
+├─ db
+│   └─ index.js //conexion a mongoDb
+├─ middleware
+│   ├─ authAdmin.js
+│   ├─ corsMiddleware.js
+
+│   ├─ multer.product.js // fotos cloudinary
+│   └─ rateLimitMiddleware.js
+├─ modules
+│   ├─ admin
+│   │   ├─ admin.controller.js
+│   │   └─ admin.routes.js
+│   ├─ client
+│   │   ├─ client.controller.js
+│   │   ├─ client.model.js
+│   │   └─ client.routes.js
+│   ├─ product
+│   │   ├─ product.controller.js
+│   │   ├─ product.model.js
+│   │   └─ product.routes.js
+│   └─ sale
+│       ├─ sale.controller.js
+│       ├─ sale.model.js
+│       └─ sale.routes.js
+├─ node_modules
+├─ public
+│   └─ index.html
+├─ .env
+├─ .gitignore
+├─ app.js
+├─ package-lock.json
+├─ package.json
+└─ scripts.js
+
+
+/frontend
 ├─ .next
 ├─ node_modules
 ├─ components
@@ -117,3 +156,28 @@ medida cel 380 x 700
 ├─ README.md
 └─ styled-jsx.d.ts
 
+
+
+
+
+
+
+
+
+
+
+
+
+A A A A A A A A A A A A A A A A A A A A A A A A A A A A 
+K K K K K K K K K K K K K K K K K K K K K K K K K K K K
+Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q Q 
+J J J J J J J J J J J J J J J J J J J J J J J J J J J J  
+10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 
+9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 
+7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 
+5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
+3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
