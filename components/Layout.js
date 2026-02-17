@@ -14,7 +14,7 @@ const Layout = ({ children}) => {
 		width: 100%;
 		max-width: calc(100% - 0.4rem);
 		color: white;
-		font-size: 20px;
+		font-size: 19px;
 		line-height: 1.6;
 	} 
   `}</style>
